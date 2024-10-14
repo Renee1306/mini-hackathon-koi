@@ -45,6 +45,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Applied Job</th>
+                            <th>Score</th>
                             <th>Name</th>
                             <th>Phone Number</th>
                             <th>Email Address</th>
@@ -56,6 +57,7 @@
                             <th>Languages</th>
                             <th>Project Links</th>
                             <th>Status</th>
+                            
                             
                         </tr>
                     </thead>
@@ -73,8 +75,9 @@
                             <td>{{ candidate[8] }}</td>
                             <td>{{ candidate[9] }}</td>
                             <td>{{ candidate[10] }}</td>
-                            <td><a href="{{ candidate[11] }}" target="_blank">Link</a></td>
-                            <td><span class="status {{ candidate[12]|lower }}">{{ candidate[12] }}</span></td>
+                            <td>{{ candidate[11] }}</td>
+                            <td><a href="{{ candidate[12] }}" target="_blank">Link</a></td>
+                            <td><span class="status {{ candidate[13]|lower }}">{{ candidate[13] }}</span></td>
                         </tr>
                         {% endfor %}
                     </tbody>

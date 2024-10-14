@@ -23,7 +23,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Optional: Loading message style */
         #loading-message {
             display: none;
             text-align: center;
@@ -54,7 +53,7 @@
             <header>
                 <h3>Job Matching Page</h3>
             </header>
-            
+
             <div class="container">
                 <h2>Upload Candidate Resume (PDF)</h2>
                 <form id="resume-form" enctype="multipart/form-data">
@@ -75,7 +74,31 @@
                 <div id="loading-spinner"></div>
                 <div id="loading-message">Processing your request...</div>
 
+                <!-- Extracted Resume Information -->
                 <h2>Extracted Resume Information</h2>
+                <table id="resume-details">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone Number</th>
+                            <th>Email Address</th>
+                            <th>Location</th>
+                            <th>Work Experience</th>
+                            <th>Education</th>
+                            <th>Hard Skills</th>
+                            <th>Soft Skills</th>
+                            <th>Languages</th>
+                            <th>Project Links</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Extracted details will be dynamically inserted here -->
+                    </tbody>
+                </table>
+
+                <!-- Resume Evaluation -->
+                <h2>Resume Evaluation</h2>
                 <table id="resume-info">
                     <thead>
                         <tr>
@@ -96,18 +119,16 @@
                 const loadingMessage = document.querySelector('#loading-message');
 
                 resumeForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();  // Prevent form submission from reloading the page
+                    e.preventDefault();
 
                     let formData = new FormData();
                     formData.append("resume", document.querySelector('#resume').files[0]);
                     formData.append("applied_job", document.querySelector('#applied-job').value);
 
-                    // Show loading spinner and message
                     loadingSpinner.style.display = 'block';
                     loadingMessage.style.display = 'block';
 
                     try {
-                        // Send the form data via fetch to the /job_matching route
                         let response = await fetch('/job_matching', {
                             method: 'POST',
                             body: formData
@@ -115,27 +136,42 @@
 
                         let result = await response.json();
 
-                        // Hide loading spinner and message when response is received
                         loadingSpinner.style.display = 'none';
                         loadingMessage.style.display = 'none';
 
                         if (result.error) {
                             alert(result.error);
                         } else {
-                            // Insert the evaluation and score into the table
-                            let tbody = document.querySelector('#resume-info tbody');
-                            tbody.innerHTML = `
+                            // Insert the extracted details into the resume-details table
+                            let detailsBody = document.querySelector('#resume-details tbody');
+                            detailsBody.innerHTML = `
+                            <tr>
+                                <td>${result.details.name}</td>
+                                <td>${result.details.phone}</td>
+                                <td>${result.details.email}</td>
+                                <td>${result.details.location}</td>
+                                <td>${result.details.work_experience}</td>
+                                <td>${result.details.education}</td>
+                                <td>${result.details.hard_skills}</td>
+                                <td>${result.details.soft_skills}</td>
+                                <td>${result.details.languages}</td>
+                                <td>${result.details.project_links}</td>
+                                <td>In-Progress</td>
+                            </tr>
+                            `;
+
+                            // Insert the evaluation and score into the resume-info table
+                            let evalBody = document.querySelector('#resume-info tbody');
+                            evalBody.innerHTML = `
                             <tr>
                                 <td>${result.evaluation.replace(/\*\*/g, '').replace(/\n/g, '<br>')}</td>
-                                <td>${result.score}/100</td>
+                                <td>${result.details.score}/100</td>
                             </tr>
                             `;
                         }
                     } catch (error) {
-                        // Hide loading spinner and message if an error occurs
                         loadingSpinner.style.display = 'none';
                         loadingMessage.style.display = 'none';
-
                         console.error('Error submitting form:', error);
                         alert('An error occurred while processing the resume.');
                     }

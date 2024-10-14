@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import PyPDF2
 import requests
+import re
 
 app = Flask(__name__)
 
@@ -79,7 +80,7 @@ def load_jobs():
             jobs.append(job)
     return jobs
 
-# Function to call Azure API to score the resume against the job description
+# Function to call Azure API to extract resume information and score
 def call_azure_api(resume_text, job_description):
     headers = {
         'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ def call_azure_api(resume_text, job_description):
     data = {
         "messages": [
             {"role": "system", "content": "You are a resume parser."},
-            {"role": "user", "content": f"Evaluate how well this resume matches the following job description: {job_description}. Here is the resume: {resume_text}. Provide a detailed evaluation and give a score out of 100 based on the match."}
+            {"role": "user", "content": f"Extract the candidate's name, phone number, email address, location, work experience, education, hard skills, soft skills, languages, and project links from the following resume: {resume_text}. Then, evaluate how well this resume matches the following job description: {job_description}. Provide a score out of 100."}
         ]
     }
 
@@ -99,14 +100,25 @@ def call_azure_api(resume_text, job_description):
         result = response.json()
         evaluation = result['choices'][0]['message']['content']
 
-        import re
-        score_match = re.search(r'Score:\s*(\d+)/100', evaluation)
-        score = score_match.group(1) if score_match else 'N/A'
+        # Use regular expressions to extract the needed information
+        details = {
+            'name': re.search(r'Name:\s*(.+)', evaluation).group(1) if re.search(r'Name:\s*(.+)', evaluation) else 'N/A',
+            'phone': re.search(r'Phone Number:\s*(.+)', evaluation).group(1) if re.search(r'Phone Number:\s*(.+)', evaluation) else 'N/A',
+            'email': re.search(r'Email Address:\s*(.+)', evaluation).group(1) if re.search(r'Email Address:\s*(.+)', evaluation) else 'N/A',
+            'location': re.search(r'Location:\s*(.+)', evaluation).group(1) if re.search(r'Location:\s*(.+)', evaluation) else 'N/A',
+            'work_experience': re.search(r'Work Experience:\s*(.+)', evaluation).group(1) if re.search(r'Work Experience:\s*(.+)', evaluation) else 'N/A',
+            'education': re.search(r'Education:\s*(.+)', evaluation).group(1) if re.search(r'Education:\s*(.+)', evaluation) else 'N/A',
+            'hard_skills': re.search(r'Hard Skills:\s*(.+)', evaluation).group(1) if re.search(r'Hard Skills:\s*(.+)', evaluation) else 'N/A',
+            'soft_skills': re.search(r'Soft Skills:\s*(.+)', evaluation).group(1) if re.search(r'Soft Skills:\s*(.+)', evaluation) else 'N/A',
+            'languages': re.search(r'Languages:\s*(.+)', evaluation).group(1) if re.search(r'Languages:\s*(.+)', evaluation) else 'N/A',
+            'project_links': re.search(r'Project Links:\s*(.+)', evaluation).group(1) if re.search(r'Project Links:\s*(.+)', evaluation) else 'N/A',
+            'score': re.search(r'Score:\s*(\d+)', evaluation).group(1) if re.search(r'Score:\s*(\d+)', evaluation) else 'N/A'
+        }
 
-        return {'evaluation': evaluation, 'score': score}
+        return {'evaluation': evaluation, 'details': details}
     else:
         return {"error": "Azure API request failed"}
-
+    
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -131,7 +143,7 @@ def open_position():
     positions_data = search_positions(search_term)  # Filter positions by search term
     return render_template('open_position.html', positions=positions_data, search_term=search_term)
 
-# Job matching page
+# Job matching page route
 @app.route('/job_matching', methods=['GET', 'POST'])
 def job_matching():
     if request.method == 'POST':
@@ -164,8 +176,23 @@ def job_matching():
             if 'error' in azure_response:
                 return jsonify({'error': azure_response['error']}), 500
 
-            # Return both evaluation and score
-            return jsonify({'evaluation': azure_response['evaluation'], 'score': azure_response['score']})
+            # Extract details from the response
+            candidate_details = azure_response['details']
+            evaluation = azure_response['evaluation']
+
+            # Generate a unique candidate ID (incremental based on current file size)
+            candidates = read_candidates()
+            candidate_id = f"C{str(len(candidates) + 1).zfill(4)}"
+
+            # Save the candidate's details into candidates.txt
+            with open('database/candidates.txt', 'a') as file:
+                file.write(f"{candidate_id}|{applied_job}|{candidate_details['score']}|{candidate_details['name']}|{candidate_details['phone']}|{candidate_details['email']}|{candidate_details['location']}|{candidate_details['work_experience']}|{candidate_details['education']}|{candidate_details['hard_skills']}|{candidate_details['soft_skills']}|{candidate_details['languages']}|{candidate_details['project_links']}|In-Progress\n")
+
+            # Return evaluation and extracted details
+            return jsonify({
+                'evaluation': evaluation,
+                'details': candidate_details
+            })
 
     # Load available jobs for dropdown selection
     jobs = load_jobs()
