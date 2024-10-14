@@ -1,0 +1,126 @@
+@import url('common.css');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+}
+
+.container {
+    display: flex;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f1f1f1;
+}
+
+header {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+header h2 {
+    font-size: 2rem;
+    color: #333;
+}
+
+header p {
+    color: #777;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.stat-box {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    flex: 1;
+    text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+}
+
+.stat-box:hover {
+    background-color: #000000; /* Background becomes black on hover */
+    color: #ffffff; /* Text becomes white on hover */
+}
+
+.stat-box span {
+    display: block;
+    font-size: 1.5rem;
+    color: #000000;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+}
+
+.stat-box span:hover {
+    background-color: #000000; /* Background becomes black on hover */
+    color: #ffffff; /* Text becomes white on hover */
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.calendar, .request {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    flex: 1;
+}
+
+.calendar-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.event {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+}
+
+.event:hover {
+    background-color: #000000; /* Background becomes black on hover */
+    color: #ffffff; /* Text becomes white on hover */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+}
+
+table th:hover, table td:hover {
+    background-color: #000000; /* Background becomes black on hover */
+    color: #ffffff; /* Text becomes white on hover */
+}
+
+table th {
+    background-color: #000000;
+    color: #fff;
+}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Matching</title>
+    <link rel="stylesheet" href="/static/job_matching.css">
+    <style>
+        /* Styling for loading spinner */
+        #loading-spinner {
+            display: none;
+            margin: 20px auto;
+            border: 6px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 6px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Optional: Loading message style */
+        #loading-message {
+            display: none;
+            text-align: center;
+            color: #3498db;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/static/img/hirenet.png" alt="HireNet Logo" style="width: 150px; height: auto;">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('candidates') }}">Candidates</a></li>
+                    <li><a href="{{ url_for('open_position') }}">Open Position</a></li>
+                    <li><a href="{{ url_for('job_matching') }}" class="active">Job Matching</a></li>
+                    <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+                    <li><a href="{{ url_for('support') }}">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <header>
+                <h3>Job Matching Page</h3>
+            </header>
+            
+            <div class="container">
+                <h2>Upload Candidate Resume (PDF)</h2>
+                <form id="resume-form" enctype="multipart/form-data">
+                    <label for="resume">Choose a PDF file:</label>
+                    <input type="file" id="resume" name="resume" accept=".pdf" required>
+
+                    <label for="applied-job">Select the Applied Job:</label>
+                    <select id="applied-job" name="applied_job" required>
+                        {% for job in jobs %}
+                            <option value="{{ job['title'] }}">{{ job['title'] }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <input type="submit" value="Upload and Score">
+                </form>
+
+                <!-- Loading spinner and message -->
+                <div id="loading-spinner"></div>
+                <div id="loading-message">Processing your request...</div>
+
+                <h2>Extracted Resume Information</h2>
+                <table id="resume-info">
+                    <thead>
+                        <tr>
+                            <th>Evaluation</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Evaluation result will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const resumeForm = document.querySelector('#resume-form');
+                const loadingSpinner = document.querySelector('#loading-spinner');
+                const loadingMessage = document.querySelector('#loading-message');
+
+                resumeForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();  // Prevent form submission from reloading the page
+
+                    let formData = new FormData();
+                    formData.append("resume", document.querySelector('#resume').files[0]);
+                    formData.append("applied_job", document.querySelector('#applied-job').value);
+
+                    // Show loading spinner and message
+                    loadingSpinner.style.display = 'block';
+                    loadingMessage.style.display = 'block';
+
+                    try {
+                        // Send the form data via fetch to the /job_matching route
+                        let response = await fetch('/job_matching', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        let result = await response.json();
+
+                        // Hide loading spinner and message when response is received
+                        loadingSpinner.style.display = 'none';
+                        loadingMessage.style.display = 'none';
+
+                        if (result.error) {
+                            alert(result.error);
+                        } else {
+                            // Insert the evaluation and score into the table
+                            let tbody = document.querySelector('#resume-info tbody');
+                            tbody.innerHTML = `
+                            <tr>
+                                <td>${result.evaluation.replace(/\*\*/g, '').replace(/\n/g, '<br>')}</td>
+                                <td>${result.score}/100</td>
+                            </tr>
+                            `;
+                        }
+                    } catch (error) {
+                        // Hide loading spinner and message if an error occurs
+                        loadingSpinner.style.display = 'none';
+                        loadingMessage.style.display = 'none';
+
+                        console.error('Error submitting form:', error);
+                        alert('An error occurred while processing the resume.');
+                    }
+                });
+            });
+            </script>
+        </div>
+    </div>
+</body>
+</html>

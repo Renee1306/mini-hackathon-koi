@@ -1,0 +1,227 @@
+@import url('common.css');
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+/* Container */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ecf0f1;
+}
+
+header {
+    background-color: #000000;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+header h3 {
+    margin: 0;
+}
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4); /* Black background with opacity */
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: white;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%; /* Adjusted width to prevent overflow */
+    max-width: 600px; /* Ensure modal doesn't grow too large on wide screens */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    overflow: hidden; /* Prevents content from overflowing */
+}
+
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
+
+.close:hover {
+    color: black;
+}
+
+.add-job-btn {
+    background-color: #000000;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.add-job-btn:hover {
+    background-color: #363636;
+}
+
+/* Input fields in the modal form */
+.modal input[type="text"],
+.modal textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Job Box Styling */
+.job-box {
+    background-color: white;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.job-box h4 {
+    margin-top: 0;
+    color: #2c3e50;
+    padding-bottom: 10px; /* Space between title and line */
+    border-bottom: 1px solid #dcdcdc; /* Thin grey line below title */
+}
+
+
+.job-box p {
+    margin: 5px 0;
+}
+
+/* Form Styles */
+form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dcdcdc;
+    margin: 0; /* Ensure form does not have unnecessary margins */
+}
+
+form label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+form input[type="text"],
+form textarea {
+    width: calc(100% - 20px); /* Adjust width to fit within padding */
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensures padding does not affect total width */
+}
+
+form button {
+    background-color: #000000;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+form button:hover {
+    background-color: #363636;
+}
+
+/* Search and Add Job Button Container */
+.search-add-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Search Bar Styling */
+.search-form {
+    display: flex;
+    flex-grow: 1;
+    max-width: 70%; /* Adjust to control the width of the search bar */
+    background: none; /* Remove any background color */
+    box-shadow: none; /* Remove any box shadow */
+    border: none; /* Remove border */
+    padding: 0; /* Remove padding */
+    margin: 0; /* Remove any margin */
+}
+
+.search-bar {
+    margin-top: 15px; /* Add space above the search bar */
+    width: 100%;
+}
+
+/* Search Button Styling */
+.search-btn {
+    background-color: #000000;
+    color: white;
+    padding: 8px 16px; /* Consistent padding for height and width */
+    border: none;
+    margin-top: 15px;
+    margin-left: 12px;
+    border-radius: 5px; /* Rounded corners for a sleek look */
+    font-size: 14px; /* Font size consistency */
+    cursor: pointer;
+    height: 40px; /* Set specific height */
+    display: flex;
+    align-items: center; /* Vertically center text */
+    justify-content: center; /* Horizontally center text */
+    transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+.search-btn:hover {
+    background-color: #363636;
+}
+
+/* Add Job Button Styling */
+.add-job-btn {
+    background-color: #000000;
+    color: white;
+    padding: 8px 16px; /* Consistent padding for height and width */
+    border: none;
+    border-radius: 5px; /* Rounded corners for a sleek look */
+    font-size: 14px; /* Font size consistency */
+    cursor: pointer;
+    height: 40px; /* Set specific height */
+    display: flex;
+    align-items: center; /* Vertically center text */
+    justify-content: center; /* Horizontally center text */
+    transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+.add-job-btn:hover {
+    background-color: #363636;
+}

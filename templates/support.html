@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/static/img/hirenet.png" alt="HireNet Logo" style="width: 150px; height: auto;">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('candidates') }}">Candidates</a></li>
+                    <li><a href="{{ url_for('open_position') }}">Open Position</a></li>
+                    <li><a href="{{ url_for('job_matching') }}">Job Matching</a></li>
+                    <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+                    <li><a href="{{ url_for('support') }}" class="active">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <header>
+                <h3>Support Page</h3>
+            </header>
+            <p>This is the support page content.</p>
+        </div>
+    </div>
+</body>
+</html>

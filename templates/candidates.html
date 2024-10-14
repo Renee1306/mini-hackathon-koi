@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidates</title>
+    <link rel="stylesheet" href="/static/candidates.css">
+    <link rel="stylesheet" href="static/common.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="static/img/hirenet.png" alt="HireNet Logo" style="width: 150px; height: auto;">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('candidates') }}" class="active">Candidates</a></li>
+                    <li><a href="{{ url_for('open_position') }}">Open Position</a></li>
+                    <li><a href="{{ url_for('job_matching') }}">Job Matching</a></li>
+                    <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+                    <li><a href="{{ url_for('support') }}">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+            <header>
+                <h3>Candidates Page</h3>
+            </header>
+            
+            <body>
+            <div class="search-bar">
+                <input type="text" placeholder="Search...">
+                <span class="icon">🔍</span>
+            </div>
+
+            <!-- Add a table container for horizontal scrolling -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Applied Job</th>
+                            <th>Name</th>
+                            <th>Phone Number</th>
+                            <th>Email Address</th>
+                            <th>Location</th>
+                            <th>Work Experience</th>
+                            <th>Education</th>
+                            <th>Hard Skills</th>
+                            <th>Soft Skills</th>
+                            <th>Languages</th>
+                            <th>Project Links</th>
+                            <th>Status</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for candidate in candidates %}
+                        <tr>
+                            <td>{{ candidate[0] }}</td>
+                            <td>{{ candidate[1] }}</td>
+                            <td>{{ candidate[2] }}</td>
+                            <td>{{ candidate[3] }}</td>
+                            <td>{{ candidate[4] }}</td>
+                            <td>{{ candidate[5] }}</td>
+                            <td>{{ candidate[6] }}</td>
+                            <td>{{ candidate[7] }}</td>
+                            <td>{{ candidate[8] }}</td>
+                            <td>{{ candidate[9] }}</td>
+                            <td>{{ candidate[10] }}</td>
+                            <td><a href="{{ candidate[11] }}" target="_blank">Link</a></td>
+                            <td><span class="status {{ candidate[12]|lower }}">{{ candidate[12] }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="static/common.css">
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="static/img/hirenet.png" alt="HireNet Logo" style="width: 150px; height: auto;">
+            </div>
+            <nav>
+                <ul>
+                    <nav>
+                        <ul>
+                            <li><a href="{{ url_for('index') }}" class="active">Dashboard</a></li>
+                            <li><a href="{{ url_for('candidates') }}">Candidates</a></li>
+                            <li><a href="{{ url_for('open_position') }}">Open Position</a></li>
+                            <li><a href="{{ url_for('job_matching') }}">Job Matching</a></li>
+                            <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+                            <li><a href="{{ url_for('support') }}">Support</a></li>
+                        </ul>
+                    </nav>
+                                   
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+            <header>
+                <h3>Welcome back, Renee!</h3>
+            </header>
+            
+            <div class="stats">
+                <div class="stat-box">Total Employee <span>20</span></div>
+                <div class="stat-box">New Employee <span>20</span></div>
+                <div class="stat-box">Open Position <span>20</span></div>
+                <div class="stat-box">Job Applicants <span>20</span></div>
+            </div>
+
+            <div class="content">
+                <div class="calendar">
+                    <h3>Today</h3>
+                    <div class="calendar-box">
+                        <p>30-07-2024</p>
+                        <div class="event">9:00 AM - Interview: Alice Wong</div>       
+                        <div class="event">2:00 PM - Interview: Long Qin Hui</div>
+                    </div>
+                    
+                </div>
+
+                <div class="request">
+                    <h3>Request</h3>
+                    <table>
+                        <tr>
+                            <th>Todo</th>
+                            <th>Date</th>
+                            <th>Member</th>
+                            <th>Status</th>
+                        </tr>
+                        <tr>
+                            <td>Task0</td>
+                            <td>Date0</td>
+                            <td>Member0</td>
+                            <td>Status0</td>
+                        </tr>
+                        <tr>
+                            <td>Task1</td>
+                            <td>Date1</td>
+                            <td>Member1</td>
+                            <td>Status1</td>
+                        </tr>
+                        <tr>
+                            <td>Task2</td>
+                            <td>Date2</td>
+                            <td>Member2</td>
+                            <td>Status2</td>
+                        </tr>
+                        <tr>
+                            <td>Task3</td>
+                            <td>Date3</td>
+                            <td>Member3</td>
+                            <td>Status3</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

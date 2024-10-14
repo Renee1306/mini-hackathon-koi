@@ -1,0 +1,106 @@
+@import url('common.css');
+
+header {
+    background-color: #000000;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+header h3 {
+    margin: 0;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Ensure the body and HTML fill the viewport */
+    font-family: Arial, sans-serif;
+    background-color: #f1f1f1; /* Apply grey background here */
+}
+
+.container {
+    display: flex;
+    min-height: 100vh; /* Ensure it fills the entire height */
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #ffffff;
+    height: 100vh; /* Sidebar takes full height */
+    position: fixed; /* Fixed to the left */
+    left: 0;
+    top: 0;
+    padding-top: 20px;
+}
+
+.main-content {
+    margin-left: 250px; /* Push the content after the sidebar */
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f1f1f1;
+    min-height: 100vh; /* Ensure the content takes full height */
+    overflow-x: hidden; /* Prevent horizontal scrolling in the main content */
+}
+
+.table-container {
+    overflow-x: auto; /* Allow horizontal scrolling for the table */
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    min-width: 1200px; /* Ensure the table has a minimum width for scrolling */
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #f8f9fa;
+    text-align: center;
+}
+
+td {
+    text-align: center;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.in-progress {
+    background-color: #ffebc2;
+    color: #f4a200;
+    border: 1px solid #f4a200;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.rejected {
+    background-color: #f8d7da;
+    color: #d9534f;
+    border: 1px solid #d9534f;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.accepted {
+    background-color: #d4edda;
+    color: #28a745;
+    border: 1px solid #28a745;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.search-bar {
+    margin-top: 15px; /* Add space above the search bar */
+    width: 100%;
+}
+

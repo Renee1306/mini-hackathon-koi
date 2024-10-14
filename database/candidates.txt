@@ -1,0 +1,3 @@
+C0001|Software Engineer|Long Qin Hui|+60123456789|qin.hui@example.com|Kuala Lumpur, Malaysia|5 years at XYZ Software|Bachelor of Computer Science|Java, Python, SQL|Teamwork, Problem-solving|English, Mandarin|https://github.com/qinhui|Accepted
+C0002|Software Engineer|Nyong Chin Venn|+60129876543|chin.venn@example.com|Penang, Malaysia|3 years at ABC Solutions|Master of Information Technology|C++, PHP, JavaScript|Leadership, Time Management|English, Malay|https://portfolio.example.com/nyongvenn|In-Progress
+C0003|Software Engineer|Ethan Walker|+60134567890|ethan.walker@example.com|Singapore|4 years at DEF Tech|Bachelor of Software Engineering|Python, Django, Java|Communication, Critical Thinking|English|https://linkedin.com/in/ethanwalker|In-Progress

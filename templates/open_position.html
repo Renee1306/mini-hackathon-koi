@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Position</title>
+    <link rel="stylesheet" href="/static/open_position.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="/static/img/hirenet.png" alt="HireNet Logo" style="width: 150px; height: auto;">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('candidates') }}">Candidates</a></li>
+                    <li><a href="{{ url_for('open_position') }}" class="active">Open Position</a></li>
+                    <li><a href="{{ url_for('job_matching') }}">Job Matching</a></li>
+                    <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+                    <li><a href="{{ url_for('support') }}">Support</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <header>
+                <h3>Open Position Page</h3>
+            </header>
+
+            <!-- Search and Add New Job Button Container -->
+            <div class="search-add-container">
+                <form class="search-form" method="GET">
+                    <input type="text" name="search" placeholder="Search for job title..." class="search-bar">
+                    <button type="submit" class="search-btn">Search</button>
+                </form>
+                <button id="openModalBtn" class="add-job-btn">Add New Job Position</button>
+            </div>
+
+            <!-- Display job positions in rectangular boxes -->
+            {% for position in positions %}
+            <div class="job-box">
+                <h4>{{ position[0] }}</h4>
+                <p><strong>Key Responsibilities:</strong> {{ position[1] }}</p>
+                <p><strong>Qualifications:</strong> {{ position[2] }}</p>
+                <p><strong>Eligibility:</strong> {{ position[3] }}</p>
+            </div>
+            {% endfor %}
+
+            <!-- The Modal -->
+            <div id="jobModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3>Add New Job Position</h3>
+                    <form method="POST">
+                        <label for="job_title">Job Title:</label><br>
+                        <input type="text" id="job_title" name="job_title" required><br><br>           
+
+                        <label for="responsibilities">Key Responsibilities:</label><br>
+                        <textarea id="responsibilities" name="responsibilities" required></textarea><br><br>
+
+                        <label for="qualifications">Qualifications:</label><br>
+                        <textarea id="qualifications" name="qualifications" required></textarea><br><br>
+
+                        <label for="eligibility">Eligibility:</label><br>
+                        <textarea id="eligibility" name="eligibility" required></textarea><br><br>
+
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get the modal
+        var modal = document.getElementById("jobModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("openModalBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
