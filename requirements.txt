@@ -1,7 +1,9 @@
-pip install unstructured
-pip install "unstructured[pdf]"
-pip install python-magic-bin
-pip install flask openai python-dotenv werkzeug
-pip install openai==0.28
-pip install flask requests
-pip install python-magic
+unstructured
+unstructured[pdf]
+python-magic-bin
+flask
+openai==0.28
+python-dotenv
+werkzeug
+requests
+python-magic

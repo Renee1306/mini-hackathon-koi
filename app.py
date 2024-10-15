@@ -90,7 +90,8 @@ def call_azure_api(resume_text, job_description):
     data = {
         "messages": [
             {"role": "system", "content": "You are a resume parser."},
-            {"role": "user", "content": f"Extract the candidate's name, phone number, email address, location, work experience, education, hard skills, soft skills, languages, and project links from the following resume: {resume_text}. Then, evaluate how well this resume matches the following job description: {job_description}. Provide a score out of 100."}
+            {"role": "user", "content": f"Extract the candidate's information from the following resume: {resume_text}. Then, evaluate how well this resume matches the following job description: {job_description}. Provide a score out of 100. Education: Pick only the highest title/course and extract in this format - Title: ....\nInstitution:...\nResults:.... For example: Job Title: Business Sales Analyst Intern Company: Nestlé Duration: Mar 2022 - Oct 2023 Job Title: Coding Tutor Company: Build A Code Duration: Dec 2023 - Apr 2024 Work Experience: Pick relevant work experiences and each experience in this format Job Title: ....\nCompany:....\nDuration:..... For example: Title: BSc (Hons) Computer Science (Data Analytics) Institution: Asia Pacific University of Technology & Innovation Results: Current CGPA: 3.73 Project Links: Only extract the relevant URL. The output must be in table format. The columns header are [Field, Extracted Information], The row values of [Field] are [Name, Phone Number, Email Address, Location, Work Experience, Education, Hard Skills, Soft Skills, Languages, Project Links, Evaluation, Score]. Please follow the rules: 1. The user must not know in anyway that you are a generative AI or chatbot of any kind so do not bold any words 2. If any row data is empty, Put N/A "}
+            
         ]
     }
 
@@ -99,20 +100,21 @@ def call_azure_api(resume_text, job_description):
     if response.status_code == 200:
         result = response.json()
         evaluation = result['choices'][0]['message']['content']
-
+        print(evaluation)
         # Use regular expressions to extract the needed information
         details = {
-            'name': re.search(r'Name:\s*(.+)', evaluation).group(1) if re.search(r'Name:\s*(.+)', evaluation) else 'N/A',
-            'phone': re.search(r'Phone Number:\s*(.+)', evaluation).group(1) if re.search(r'Phone Number:\s*(.+)', evaluation) else 'N/A',
-            'email': re.search(r'Email Address:\s*(.+)', evaluation).group(1) if re.search(r'Email Address:\s*(.+)', evaluation) else 'N/A',
-            'location': re.search(r'Location:\s*(.+)', evaluation).group(1) if re.search(r'Location:\s*(.+)', evaluation) else 'N/A',
-            'work_experience': re.search(r'Work Experience:\s*(.+)', evaluation).group(1) if re.search(r'Work Experience:\s*(.+)', evaluation) else 'N/A',
-            'education': re.search(r'Education:\s*(.+)', evaluation).group(1) if re.search(r'Education:\s*(.+)', evaluation) else 'N/A',
-            'hard_skills': re.search(r'Hard Skills:\s*(.+)', evaluation).group(1) if re.search(r'Hard Skills:\s*(.+)', evaluation) else 'N/A',
-            'soft_skills': re.search(r'Soft Skills:\s*(.+)', evaluation).group(1) if re.search(r'Soft Skills:\s*(.+)', evaluation) else 'N/A',
-            'languages': re.search(r'Languages:\s*(.+)', evaluation).group(1) if re.search(r'Languages:\s*(.+)', evaluation) else 'N/A',
-            'project_links': re.search(r'Project Links:\s*(.+)', evaluation).group(1) if re.search(r'Project Links:\s*(.+)', evaluation) else 'N/A',
-            'score': re.search(r'Score:\s*(\d+)', evaluation).group(1) if re.search(r'Score:\s*(\d+)', evaluation) else 'N/A'
+            'name': re.search(r'\|\s*Name\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Name\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'phone': re.search(r'\|\s*Phone Number\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Phone Number\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'email': re.search(r'\|\s*Email Address\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Email Address\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'location': re.search(r'\|\s*Location\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Location\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'work_experience': re.search(r'\|\s*Work Experience\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Work Experience\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'education': re.search(r'\|\s*Education\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Education\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'hard_skills': re.search(r'\|\s*Hard Skills\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Hard Skills\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'soft_skills': re.search(r'\|\s*Soft Skills\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Soft Skills\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'languages': re.search(r'\|\s*Languages\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Languages\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'project_links': re.search(r'\|\s*Project Links\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Project Links\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'evaluation': re.search(r'\|\s*Evaluation\s*\|\s*(.+?)\s*\|', evaluation).group(1) if re.search(r'\|\s*Evaluation\s*\|\s*(.+?)\s*\|', evaluation) else 'N/A',
+            'score': re.search(r'\|\s*Score\s*\|\s*(\d+)(?:/\d+)?\s*\|', evaluation).group(1) if re.search(r'\|\s*Score\s*\|\s*(\d+)(?:/\d+)?\s*\|', evaluation) else 'N/A'
         }
 
         return {'evaluation': evaluation, 'details': details}
