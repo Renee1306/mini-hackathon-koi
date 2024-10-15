@@ -1,7 +1,7 @@
 /* common.css - Sidebar styles shared by all pages */
 
 .sidebar {
-    width: 250px; /* Standardized sidebar width */
+    width: 200px; /* Standardized sidebar width */
     background-color: #ffffff;
     color: #010000;
     height: 100vh;
@@ -12,6 +12,7 @@
 }
 
 .sidebar-header {
+    margin-top: 10px;
     text-align: center;
     margin-bottom: 30px;
 }
@@ -42,7 +43,7 @@
 
 /* Main content layout */
 .main-content {
-    margin-left: 250px; /* Ensure this matches the sidebar width */
+    margin-left: 200px; /* Ensure this matches the sidebar width */
     padding: 20px;
     background-color: #f1f1f1;
 }

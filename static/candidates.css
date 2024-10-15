@@ -25,7 +25,7 @@ html, body {
 }
 
 .sidebar {
-    width: 250px;
+    width: 200px;
     background-color: #ffffff;
     height: 100vh; /* Sidebar takes full height */
     position: fixed; /* Fixed to the left */
@@ -34,8 +34,9 @@ html, body {
     padding-top: 20px;
 }
 
+
 .main-content {
-    margin-left: 250px; /* Push the content after the sidebar */
+    margin-left: 200px; /* Push the content after the sidebar */
     flex-grow: 1;
     padding: 20px;
     background-color: #f1f1f1;
@@ -59,6 +60,7 @@ th, td {
     padding: 12px 15px;
     text-align: left;
     border: 1px solid #ddd;
+    font-size: 12px; 
 }
 
 th {

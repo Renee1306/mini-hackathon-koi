@@ -22,7 +22,7 @@ body {
 }
 
 header {
-    margin-top: 20px;
+    margin-top: 15px;
     margin-bottom: 20px;
 }
 
@@ -47,7 +47,8 @@ header p {
     border-radius: 5px;
     flex: 1;
     text-align: center;
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+    transition: background-color 0.3s ease, color 0.3s ease; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .stat-box:hover {
@@ -85,7 +86,7 @@ header p {
     padding: 20px;
     border-radius: 5px;
     margin-top: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .event {
@@ -94,7 +95,7 @@ header p {
     padding: 10px;
     border-radius: 5px;
     margin-top: 10px;
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .event:hover {

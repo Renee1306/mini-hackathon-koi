@@ -42,7 +42,7 @@ header h3 {
     height: 100%;
     overflow: auto;
     background-color: rgba(0,0,0,0.4); /* Black background with opacity */
-    padding-top: 60px;
+    padding-top: 0px;
 }
 
 .modal-content {
@@ -79,7 +79,6 @@ header h3 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 20px;
 }
 
 .add-job-btn:hover {
@@ -99,16 +98,17 @@ header h3 {
 /* Job Box Styling */
 .job-box {
     background-color: white;
-    padding: 20px;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    padding: 15px;
+    margin-top: 10px;
+    margin-bottom: 15px;
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
 }
 
 .job-box h4 {
-    margin-top: 0;
+    margin-top: 0px;
     color: #2c3e50;
     padding-bottom: 10px; /* Space between title and line */
     border-bottom: 1px solid #dcdcdc; /* Thin grey line below title */
@@ -126,7 +126,7 @@ form {
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border: 1px solid #dcdcdc;
-    margin: 0; /* Ensure form does not have unnecessary margins */
+    margin: 0; 
 }
 
 form label {
@@ -139,7 +139,7 @@ form input[type="text"],
 form textarea {
     width: calc(100% - 20px); /* Adjust width to fit within padding */
     padding: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box; /* Ensures padding does not affect total width */
@@ -148,11 +148,11 @@ form textarea {
 form button {
     background-color: #000000;
     color: white;
-    padding: 10px 20px;
+    padding: 20px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 12px;
 }
 
 form button:hover {
@@ -164,7 +164,7 @@ form button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 2px;
 }
 
 /* Search Bar Styling */
@@ -220,6 +220,7 @@ form button:hover {
     align-items: center; /* Vertically center text */
     justify-content: center; /* Horizontally center text */
     transition: background-color 0.3s ease; /* Smooth hover transition */
+    margin-top: 10px;
 }
 
 .add-job-btn:hover {
