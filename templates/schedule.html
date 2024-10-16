@@ -5,6 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Support</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Basic styles for the calendar */
+        .calendar {
+            display: table;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .calendar-header {
+            display: table-row;
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        .calendar-header div {
+            display: table-cell;
+            padding: 10px;
+            text-align: center;
+        }
+        .calendar-body {
+            display: table-row-group;
+        }
+        .calendar-body .week {
+            display: table-row;
+        }
+        .calendar-body .day {
+            display: table-cell;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .calendar-body .day:hover {
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+        .calendar-body .empty {
+            background-color: #fff;
+        }
+        /* Styling the current day (optional) */
+        .calendar-body .current-day {
+            background-color: #ffe5b4;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -14,21 +57,86 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="{{ url_for('index') }}">Dashboard</a></li>
-                    <li><a href="{{ url_for('candidates') }}">Candidates</a></li>
-                    <li><a href="{{ url_for('open_position') }}">Open Position</a></li>
-                    <li><a href="{{ url_for('job_matching') }}">Resume Extraction</a></li>
-                    <li><a href="{{ url_for('schedule') }}"class="active">Schedule</a></li>
-                    <li><a href="{{ url_for('comparison') }}">Comparison</a></li>
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="{{ url_for('candidates') }}"><i class="fas fa-users"></i> Candidates</a></li>
+                    <li><a href="{{ url_for('open_position') }}"><i class="fas fa-briefcase"></i> Open Position</a></li>
+                    <li><a href="{{ url_for('job_matching') }}"><i class="fas fa-file-alt"></i> Resume Extraction</a></li>
+                    <li><a href="{{ url_for('schedule') }}" class="active"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
+                    <li><a href="{{ url_for('comparison') }}"><i class="fas fa-balance-scale"></i> Comparison</a></li>
                 </ul>
             </nav>
         </div>
 
         <div class="main-content">
             <header>
-                <h3>Schedule Page</h3>
+                <h3>Calendar</h3>
+                <h3>October 2024</h3>
             </header>
-            <p>This is the Schedule page content.</p>
+            <div class="calendar">
+                <!-- Calendar Header (Days of the Week) -->
+                <div class="calendar-header">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                </div>
+                <!-- Calendar Body (Dates of the Month) -->
+                <div class="calendar-body">
+                    <!-- First Week (start October 1st on a Tuesday) -->
+                    <div class="week">
+                        <div class="day empty"></div>
+                        <div class="day empty"></div>
+                        <div class="day">1</div>
+                        <div class="day">2</div>
+                        <div class="day">3</div>
+                        <div class="day">4</div>
+                        <div class="day">5</div>
+                    </div>
+                    <!-- Second Week -->
+                    <div class="week">
+                        <div class="day">6</div>
+                        <div class="day">7</div>
+                        <div class="day">8</div>
+                        <div class="day">9</div>
+                        <div class="day">10</div>
+                        <div class="day">11</div>
+                        <div class="day">12</div>
+                    </div>
+                    <!-- Third Week -->
+                    <div class="week">
+                        <div class="day">13</div>
+                        <div class="day">14</div>
+                        <div class="day">15</div>
+                        <div class="day">16</div>
+                        <div class="day">17</div>
+                        <div class="day">18</div>
+                        <div class="day">19</div>
+                    </div>
+                    <!-- Fourth Week -->
+                    <div class="week">
+                        <div class="day">20</div>
+                        <div class="day">21</div>
+                        <div class="day">22</div>
+                        <div class="day">23</div>
+                        <div class="day">24</div>
+                        <div class="day">25</div>
+                        <div class="day">26</div>
+                    </div>
+                    <!-- Fifth Week -->
+                    <div class="week">
+                        <div class="day">27</div>
+                        <div class="day">28</div>
+                        <div class="day">29</div>
+                        <div class="day">30</div>
+                        <div class="day">31</div>
+                        <div class="day empty"></div>
+                        <div class="day empty"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </body>
