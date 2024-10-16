@@ -18,20 +18,9 @@ def list_to_string(item):
     else:
         # Convert non-list items directly to a string
         return str(item)
-    
-# Function to read candidates.txt and parse data
-def read_candidates():
-    candidates = []
-    with open('database/candidates.txt', 'r') as file:
-        for line in file:
-            # Split each line by the '|' character and store it as a list
-            candidate_data = line.strip().split('|')
-            candidate_data[14]= "file:///" + candidate_data[14].replace(" ", "%20").replace("\\", "/")
-            print("Link" + candidate_data[14])
-            candidates.append(candidate_data)
 
-    return candidates
-
+      
+      
 def get_candidates(selected_string):
     selected_list = selected_string.split(', ')
     candidates = []
@@ -58,6 +47,44 @@ def get_job(chosen_job):
                 position_data[3] = position_data[3].replace(', ', '\n')  # Eligibility
                 break
     return position_data
+  
+  def comparison_azure(candidates_compare_json, job_description):
+    print(candidates_compare_json)
+    print(job_description)
+    headers = {
+        'Content-Type': 'application/json',
+        'api-key': AZURE_API_KEY
+    }
+ 
+    data = {
+        "messages": [
+            {"role": "system", "content": "You are a resume reviewer to rank the talents."},
+            {"role": "user", "content": f"By reviewing the given candidates {candidates_compare_json} and the job description {job_description}. Give me the evaluation of the ranking of the candidates based on the job description."}
+        ]
+    }
+
+    response = requests.post(AZURE_API_URL, headers=headers, json=data)
+
+    if response.status_code == 200:
+        result = response.json()
+        evaluation = result['choices'][0]['message']['content']
+        return evaluation
+    else:
+        return "Evaluation error"
+      
+# Function to read candidates.txt and parse data
+def read_candidates():
+    candidates = []
+    with open('database/candidates.txt', 'r') as file:
+        for line in file:
+            # Split each line by the '|' character and store it as a list
+            candidate_data = line.strip().split('|')
+            candidate_data[14]= "file:///" + candidate_data[14].replace(" ", "%20").replace("\\", "/")
+            print("Link" + candidate_data[14])
+            candidates.append(candidate_data)
+
+    return candidates
+
 
 # Function to read open_position.txt and parse data
 def read_positions():
@@ -230,60 +257,6 @@ def call_azure_api(resume_text, job_description):
     else:
         return {"error": "Azure API request failed"}
 
-
-def comparison_azure(candidates_compare_json, job_description):
-    print(candidates_compare_json)
-    print(job_description)
-    headers = {
-        'Content-Type': 'application/json',
-        'api-key': AZURE_API_KEY
-    }
- 
-    data = {
-        "messages": [
-            {"role": "system", "content": "You are a resume reviewer to rank the talents."},
-            {"role": "user", "content": f"By reviewing the given candidates {candidates_compare_json} and the job description {job_description}. Give me the evaluation of the ranking of the candidates based on the job description."}
-        ]
-    }
-
-    response = requests.post(AZURE_API_URL, headers=headers, json=data)
-
-    if response.status_code == 200:
-        result = response.json()
-        evaluation = result['choices'][0]['message']['content']
-        return evaluation
-    else:
-        return "Evaluation error"
-
-def jd_azure(job_description):
-    headers = {
-        'Content-Type': 'application/json',
-        'api-key': AZURE_API_KEY
-    }
-    template = """{
-    "job_title": "Software Engineer",
-    "responsibilities": "Design code and test software.",
-    "qualifications": "Bachelor's degree in Computer Science.",
-    "eligibility": "Must have 2+ years of experience in software development.",
-    "hard_skills": "Programming languages (e.g. Python Java C++) software development lifecycle testing and debugging version control (e.g. Git).",
-    "soft_skills": "Problem-solving attention to detail teamwork time management."}"""
-    data = {
-        "messages": [
-            {"role": "system", "content": "You are a job description parser."},
-            {"role": "user", "content": f"Extract the job's information from the following job description: {job_description}. The json file must have job_title, responsibilities, qualifications, eligibility, hard_skills, and soft_skills. Please follow the rules: 1. The user must not know in anyway that you are a generative AI or chatbot of any kind so do not bold any words 2. If any field is empty, put N/A 3.  The output must be in json format."}
-        ]
-    }
-    response = requests.post(AZURE_API_URL, headers=headers, json=data)
-
-    if response.status_code == 200:
-        result = response.json()
-        evaluation = result['choices'][0]['message']['content']
-        evaluation_json = json.loads(evaluation)
-        print(evaluation_json)
-        return evaluation_json
-    else:
-        return {"error": "Azure API request failed"}
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -328,7 +301,6 @@ def open_position():
     positions_data = search_positions(search_term)  # Filter positions by search term
     return render_template('open_position.html', positions=positions_data, search_term=search_term)
 
-# Job matching page route
 @app.route('/job_matching', methods=['GET', 'POST'])
 def job_matching():
     if request.method == 'POST':
@@ -361,17 +333,20 @@ def job_matching():
         if not selected_job:
             return jsonify({'error': 'Job not found'}), 404
 
-        job_description = f"{selected_job['description']} {selected_job['qualification']} {selected_job['experience']} {selected_job['hard_skills']}{selected_job['soft_skills']}"
+        job_description = f"{selected_job['description']} {selected_job['qualification']} {selected_job['experience']} {selected_job['hard_skills']} {selected_job['soft_skills']}"
 
-        # Send the resume and job description to Azure OpenAI
+        # Send the resume and job description to Azure OpenAI for evaluation
         azure_response = call_azure_api(resume_text, job_description)
 
         if 'error' in azure_response:
             return jsonify({'error': azure_response['error']}), 500
 
-        # Extract details from the response
+        # Extract details from the Azure OpenAI response
         candidate_details = azure_response['details']
         evaluation = azure_response['evaluation']
+
+        # Get job title recommendations from Azure OpenAI
+        job_suggestions = suggest_similar_jobs(resume_text)
 
         # Generate a unique candidate ID (incremental based on current file size)
         candidates = read_candidates()
@@ -382,30 +357,60 @@ def job_matching():
         with open('database/candidates.txt', 'a') as file:
             file.write(f"{candidate_id}|{applied_job}|{candidate_details['score']}|{candidate_details['name']}|{candidate_details['phone']}|{candidate_details['email']}|{candidate_details['location']}|{candidate_details['work_experience']}|{candidate_details['education']}|{candidate_details['hard_skills']}|{candidate_details['soft_skills']}|{candidate_details['languages']}|{candidate_details['project_links']}|In-Progress|{absolute_file_path}\n")
 
-        # Return evaluation and extracted details
+        # Return the evaluation, extracted details, and job title suggestions
         return jsonify({
             'evaluation': evaluation,
-            'details': candidate_details
+            'details': candidate_details,
+            'job_suggestions': job_suggestions  # Include suggestions in the response
         })
 
-    # Load available jobs for dropdown selection
+    # Load available jobs for dropdown selection if it's a GET request
     jobs = load_jobs()
     return render_template('job_matching.html', jobs=jobs)
 
+
+# Function to suggest similar job titles based on Azure OpenAI
+def suggest_similar_jobs(resume_text):
+    # Get all job titles from the open_position.txt file
+    job_titles = [job['title'] for job in load_jobs()]
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'api-key': AZURE_API_KEY
+    }
+
+    data = {
+        "messages": [
+            {"role": "system", "content": "You are a job title recommender."},
+            {"role": "user", "content": f"Based on the following resume: {resume_text}. Only suggest job titles based on this list: {', '.join(job_titles)} no title out of this file"}
+        ]
+    }
+
+    response = requests.post(AZURE_API_URL, headers=headers, json=data)
+
+    if response.status_code == 200:
+        result = response.json()
+        recommendations = result['choices'][0]['message']['content']
+        return recommendations.split('\n')  # Assuming the response contains job titles in new lines
+    else:
+        return ["Error fetching job recommendations"]
+    
 @app.route('/schedule')
 def schedule():
     return render_template('schedule.html')
 
+
 @app.route('/comparison', methods=['GET', 'POST'])
 def comparison():
     if request.method == 'POST':
-        compares = request.form['resultText']  # This should now work without KeyError
+        compares = request.form['resultText']  # Selected candidates for comparison
         candidates = get_candidates(compares)
         # Format candidate data for easy rendering
         formatted_candidates = []
         for candidate in candidates:
             formatted_candidates.append({
                 'id': candidate[0],
+                'applied_job': candidate[1],
                 'name': candidate[3],
                 'experience': candidate[7],
                 'education': candidate[8],
@@ -418,18 +423,21 @@ def comparison():
         
         job_data = get_job(job)
         evaluation = comparison_azure(formatted_candidates, job_data)
-        print(evaluation)
         return evaluation 
     else:
-        candidates = []  # Handle GET request case if needed
+        # Handle GET request for filtering candidates
+        candidates_data = read_candidates()
+        selected_job = request.args.get('applied_job', '')
 
-    candidates_data = read_candidates()
-    jobs = load_jobs()
-    return render_template('comparison.html', candidates=candidates_data, jobs=jobs)
+        if selected_job:
+            candidates_data = [candidate for candidate in candidates_data if candidate[1] == selected_job]
+
+        jobs = load_jobs()  # Load the jobs for dropdown
+
+        return render_template('comparison.html', candidates=candidates_data, jobs=jobs)
 
 @app.route('/cv_viewer')
 def cv_viewer():
-
     return render_template('cv_viewer.html')
 
 if __name__ == '__main__':

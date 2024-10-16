@@ -43,7 +43,7 @@
                     <li><a href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                     <li><a href="{{ url_for('candidates') }}" ><i class="fas fa-users"></i> Candidates</a></li>
                     <li><a href="{{ url_for('open_position') }}"><i class="fas fa-briefcase"></i> Open Position</a></li>
-                    <li><a href="{{ url_for('job_matching') }}"class="active"><i class="fas fa-file-alt"></i> Resume Extraction</a></li>
+                    <li><a href="{{ url_for('job_matching') }}" class="active"><i class="fas fa-file-alt"></i> Resume Extraction</a></li>
                     <li><a href="{{ url_for('schedule') }}"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
                     <li><a href="{{ url_for('comparison') }}"><i class="fas fa-balance-scale"></i> Comparison</a></li>
                 </ul>
@@ -102,6 +102,12 @@
                         <!-- Evaluation result will be dynamically inserted here -->
                     </tbody>
                 </table>
+
+                <!-- Job Title Suggestions -->
+                <h2>Suggested Job Titles</h2>
+                <ul id="job-suggestions">
+                    <!-- Suggested job titles will be dynamically inserted here -->
+                </ul>
             </div>
 
             <script>
@@ -136,8 +142,8 @@
                         } else {
                             // Insert the extracted details into the resume-details table
                             let detailsBody = document.querySelector('#resume-details tbody');
-                            detailsBody.innerHTML = `
-                            <tr>
+                            detailsBody.innerHTML = 
+                            `<tr>
                                 <td>Name</td>
                                 <td>${result.details.name}</td>
                             </tr>
@@ -180,19 +186,25 @@
                             <tr>
                                 <td>Status</td>
                                 <td>In-Progress</td>
-                            </tr>
-                            `;
+                            </tr>`;
 
                             // Insert the evaluation and score into the resume-info table
-                            // <td>${result.evaluation.replace(/\*\*/g, '').replace(/\n/g, '<br>')}</td>
                             let evalBody = document.querySelector('#resume-info tbody');
-                            evalBody.innerHTML = `
-                            <tr>
-                                
+                            evalBody.innerHTML = 
+                            `<tr>
                                 <td>${result.details.evaluation}</td>
                                 <td>${result.details.score}/100</td>
-                            </tr>
-                            `;
+                            </tr>`;
+
+                            // Insert job suggestions into the job-suggestions list
+                            let suggestionsList = document.querySelector('#job-suggestions');
+                            suggestionsList.innerHTML = '';  // Clear previous suggestions if any
+
+                            result.job_suggestions.forEach(function(suggestion) {
+                                let listItem = document.createElement('li');
+                                listItem.textContent = suggestion;
+                                suggestionsList.appendChild(listItem);
+                            });
                         }
                     } catch (error) {
                         loadingSpinner.style.display = 'none';
