@@ -132,24 +132,19 @@
                     <div id="candidateInfoDisplay"></div> <!-- Placeholder for candidate info -->
                 </div>
             </div>
-        </div> <!-- End of main-content -->
-    </div> <!-- End of container -->
+        </div> 
+    </div> 
 
-    <!-- JavaScript for Popup Functionality -->
     <script>
-        // Get the modal for comparison confirmation
         var popup = document.getElementById("popup");
         var compareButton = document.getElementById("openCompareBtn");
         var resultText = document.getElementById("resultText");
         var closePopup = document.getElementById("closePopup");
     
-        // Get the modal for candidate information
         var candidateInfoPopup = document.getElementById("candidateInfoPopup");
         var closeCandidateInfoPopup = document.getElementById("closeCandidateInfoPopup");
     
-        // When the user clicks the Compare button, open the modal 
         compareButton.onclick = function() {
-            // Get all checked checkboxes
             const checkedCheckboxes = document.querySelectorAll('input[name="selected_candidate"]:checked');
             
             // Extract values

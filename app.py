@@ -343,8 +343,6 @@ def schedule():
     return render_template('schedule.html')
 
 @app.route('/comparison', methods=['GET', 'POST'])
-@app.route('/comparison', methods=['GET', 'POST'])
-
 def comparison():
     if request.method == 'POST':
         compares = request.form['resultText']  # This should now work without KeyError
