@@ -65,7 +65,7 @@
                         {% for candidate in candidates %}
                         <tr>
                             <td>{{ candidate[0] }}</td>
-                            <td>{{ candidate[1] }}</td>
+                            <td><a href="{{ url_for('cv_viewer') }}">{{ candidate[1] }}</a></td>
                             <td>{{ candidate[2] }}</td>
                             <td>{{ candidate[3] }}</td>
                             <td>{{ candidate[4] }}</td>
