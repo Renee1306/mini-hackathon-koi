@@ -8,6 +8,78 @@
     <link rel="stylesheet" href="/static/candidates.css">
     <link rel="stylesheet" href="static/common.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        // Filter candidates based on applied job
+        function filterCandidates() {
+            var filter = document.getElementById("jobFilter").value.toLowerCase();
+            var rows = document.getElementById("candidatesTable").getElementsByTagName("tr");
+            var table = document.getElementById("candidatesTable");
+            var isAnyRowVisible = false;
+
+            // If no specific filter is applied, show all rows
+            if (filter === "") {
+                for (var i = 1; i < rows.length; i++) {  // Start from 1 to skip the header row
+                    rows[i].style.display = "";  // Show all rows
+                }
+                table.style.display = "table";  // Ensure table is displayed
+                return;
+            }
+
+            // Loop through table rows and filter based on the selected job
+            for (var i = 1; i < rows.length; i++) {  // Start from 1 to skip the header row
+                var jobCell = rows[i].getElementsByTagName("td")[1]; // Applied job is in the second column
+                if (jobCell) {
+                    var jobText = jobCell.textContent || jobCell.innerText;
+                    if (jobText.toLowerCase() === filter) {
+                        rows[i].style.display = "";  // Show matching row
+                        isAnyRowVisible = true;      // At least one row is visible
+                    } else {
+                        rows[i].style.display = "none";  // Hide non-matching row
+                    }
+                }
+            }
+
+            // Show or hide the table based on the filter selection
+            if (!isAnyRowVisible) {
+                table.style.display = "none";  // Hide the table if no rows match the filter
+            } else {
+                table.style.display = "table"; // Show the table if any rows match the filter
+            }
+        }
+
+        // Sort table by score
+        function sortTableByScore() {
+            var table, rows, switching, i, x, y, shouldSwitch;
+            table = document.getElementById("candidatesTable");
+            switching = true;
+
+            // Loop until no switching is needed
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+
+                // Loop through all table rows (except the first, which contains headers)
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    // Compare the two elements in the "Score" column
+                    x = rows[i].getElementsByTagName("TD")[2]; // Score is in the 3rd column (index 2)
+                    y = rows[i + 1].getElementsByTagName("TD")[2];
+
+                    // Check if the two rows should switch places, based on descending order
+                    if (parseFloat(x.innerHTML) < parseFloat(y.innerHTML)) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+
+                if (shouldSwitch) {
+                    // If a switch has been marked, make the switch and mark that switching is done
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -16,16 +88,16 @@
             <div class="sidebar-header">
                 <img src="static/img/hirenet.png" alt="HireNet Logo" style="width: 150px; height: auto;">
             </div>
-<nav>
-    <ul>
-        <li><a href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="{{ url_for('candidates') }}" class="active"><i class="fas fa-users"></i> Candidates</a></li>
-        <li><a href="{{ url_for('open_position') }}"><i class="fas fa-briefcase"></i> Open Position</a></li>
-        <li><a href="{{ url_for('job_matching') }}"><i class="fas fa-file-alt"></i> Resume Extraction</a></li>
-        <li><a href="{{ url_for('schedule') }}"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
-        <li><a href="{{ url_for('comparison') }}"><i class="fas fa-balance-scale"></i> Comparison</a></li>
-    </ul>
-</nav>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="{{ url_for('candidates') }}" class="active"><i class="fas fa-users"></i> Candidates</a></li>
+                    <li><a href="{{ url_for('open_position') }}"><i class="fas fa-briefcase"></i> Open Position</a></li>
+                    <li><a href="{{ url_for('job_matching') }}"><i class="fas fa-file-alt"></i> Resume Extraction</a></li>
+                    <li><a href="{{ url_for('schedule') }}"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
+                    <li><a href="{{ url_for('comparison') }}"><i class="fas fa-balance-scale"></i> Comparison</a></li>
+                </ul>
+            </nav>
         </div>
 
         <!-- Main content -->
@@ -34,7 +106,14 @@
                 <h3>Candidates Page</h3>
             </header>
             
-            <body>
+            <!-- Drop-down filter for applied jobs -->
+            <select id="jobFilter" onchange="filterCandidates()">
+                <option value="">Applied Jobs</option>
+                {% for job in applied_jobs %}
+                <option value="{{ job }}">{{ job }}</option>
+                {% endfor %}
+            </select>
+
             <div class="search-bar">
                 <input type="text" placeholder="Search...">
                 <span class="icon">🔍</span>
@@ -42,12 +121,12 @@
 
             <!-- Add a table container for horizontal scrolling -->
             <div class="table-container">
-                <table>
+                <table id="candidatesTable">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Applied Job</th>
-                            <th>Score</th>
+                            <th onclick="sortTableByScore()">Score <i class="fas fa-sort"></i></th> <!-- Sort button with icon -->
                             <th>Name</th>
                             <th>Phone Number</th>
                             <th>Email Address</th>
@@ -59,8 +138,6 @@
                             <th>Languages</th>
                             <th>Project Links</th>
                             <th>Status</th>
-                            
-                            
                         </tr>
                     </thead>
                     <tbody>
