@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comparison</title>
     <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
 </head>
 <body>
     <div class="container">
+        <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <img src="/static/img/hirenet.png" alt="HireNet Logo" style="width: 150px; height: auto;">
+                <img src="static/img/hirenet.png" alt="HireNet Logo" style="width: 150px; height: auto;">
             </div>
             <nav>
                 <ul>
@@ -25,12 +26,149 @@
             </nav>
         </div>
 
+        <!-- Main content -->
         <div class="main-content">
             <header>
                 <h3>Comparison Page</h3>
             </header>
-            <p>This is the support page content.</p>
-        </div>
-    </div>
+
+            <button id="openCompareBtn" class="compare-button">Compare</button>
+
+            <!-- Add a table container for horizontal scrolling -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Score</th>
+                            <th>Name</th>
+                            <th>Work Experience</th>
+                            <th>Education</th>
+                            <th>Hard Skills</th>
+                            <th>Soft Skills</th>
+                            <th>Languages</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for candidate in candidates %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="selected_candidate" value="{{ candidate[0] }}"> 
+                                {{ candidate[0] }}
+                            </td>
+                            <td>{{ candidate[2] }}</td>
+                            <td>{{ candidate[3] }}</td>
+                            <td>{{ candidate[7] }}</td>
+                            <td>{{ candidate[8] }}</td>
+                            <td>{{ candidate[9] }}</td>
+                            <td>{{ candidate[10] }}</td>
+                            <td>{{ candidate[11] }}</td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div id="popup" class="popup">
+                <div class="popup-content">
+                    <span class="close" id="closePopup">&times;</span>
+                    <form method="POST" action="/comparison"> <!-- Ensure action points to your comparison route -->
+                        <h3>Comparison Confirmation</h3>
+                        <p id="resultDisplay"></p> <!-- Display selected candidates here -->
+                        <input type="hidden" id="resultText" name="resultText"> <!-- Hidden input for result text -->
+            
+                        <!-- Dropdown for applied job -->
+                        <label for="applied-job">Select Job:</label>
+                        <select id="applied-job" name="applied-job" required>
+                            <option value="">Select a job</option>
+                            {% for job in jobs %}
+                                <option value="{{ job['title'] }}">{{ job['title'] }}</option>
+                            {% endfor %}
+                        </select>
+            
+                        <button type="submit">Compare</button>
+                    </form>
+                </div>
+            </div>
+            <div id="candidateInfoPopup" class="popup" style="display: none;">
+                <div class="popup-content">
+                    <span class="close" id="closeCandidateInfoPopup">&times;</span>
+                    <h3>Candidate Information</h3>
+                    <div id="candidateInfoDisplay"></div> <!-- Placeholder for candidate info -->
+                </div>
+            </div>
+        </div> <!-- End of main-content -->
+    </div> <!-- End of container -->
+
+    <!-- JavaScript for Popup Functionality -->
+    <script>
+        // Get the modal for comparison confirmation
+        var popup = document.getElementById("popup");
+        var compareButton = document.getElementById("openCompareBtn");
+        var resultText = document.getElementById("resultText");
+        var closePopup = document.getElementById("closePopup");
+    
+        // Get the modal for candidate information
+        var candidateInfoPopup = document.getElementById("candidateInfoPopup");
+        var closeCandidateInfoPopup = document.getElementById("closeCandidateInfoPopup");
+    
+        // When the user clicks the Compare button, open the modal 
+        compareButton.onclick = function() {
+            // Get all checked checkboxes
+            const checkedCheckboxes = document.querySelectorAll('input[name="selected_candidate"]:checked');
+            
+            // Extract values
+            const selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
+            
+            // Display results in the popup
+            if (selectedValues.length > 0) {
+                const displayString = selectedValues.join(', ');
+                document.getElementById('resultDisplay').textContent = displayString; // Show selected candidates in popup
+                document.getElementById('resultText').value = displayString; // Set hidden input value
+    
+                popup.style.display = "block"; // Show popup
+            } else {
+                document.getElementById('resultDisplay').textContent = 'No candidates selected.';
+                document.getElementById('resultText').value = ''; // Clear hidden input if no candidates are selected
+                popup.style.display = "block"; // Show popup if no candidates are selected
+            }
+        }
+    
+        // Handle form submission via AJAX
+        document.querySelector('#popup form').onsubmit = function(event) {
+            event.preventDefault(); // Prevent default form submission
+    
+            const formData = new FormData(this); // Get form data
+    
+            fetch('/comparison', {
+                method: 'POST',
+                body: formData // Send form data to Flask
+            })
+            .then(response => response.text()) // Change to .text() to handle plain text response
+            .then(data => {
+                // Set inner HTML for display (split lines for better formatting)
+                document.getElementById('candidateInfoDisplay').innerHTML = data.replace(/\n/g, '<br>'); // Replace newlines with <br> for HTML
+                
+                candidateInfoPopup.style.display = "block"; // Show candidate info popup
+    
+                popup.style.display = "none"; // Hide original popup after submission
+            })
+            .catch((error) => {
+                console.error('Error:', error); // Handle error response if needed
+            });
+        }
+    
+        // Close Candidate Info Popup
+        closeCandidateInfoPopup.onclick = function() {
+            candidateInfoPopup.style.display = "none"; // Hide candidate info popup when closed
+        }
+    
+        // Close Comparison Popup
+        closePopup.onclick = function() {
+            popup.style.display = "none"; // Hide comparison popup when closed
+        }
+    </script>
 </body>
 </html>

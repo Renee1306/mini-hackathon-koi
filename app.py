@@ -24,6 +24,34 @@ def read_candidates():
 
     return candidates
 
+def get_candidates(selected_string):
+    selected_list = selected_string.split(', ')
+    candidates = []
+    with open('database/candidates.txt', 'r') as file:
+        for select in selected_list:
+            for line in file:
+                # Split each line by the '|' character and store it as a list
+                candidate_data = line.strip().split('|')
+                if candidate_data[0] == select:
+                    candidate_data[14]= "file:///" + candidate_data[14].replace(" ", "%20").replace("\\", "/")
+                    print("Link" + candidate_data[14])
+                    candidates.append(candidate_data)
+                    break
+    return candidates
+
+def get_job(chosen_job):
+    with open('database/open_position.txt', 'r') as file:
+        for line in file:
+            position_data = line.strip().split('|')
+            if position_data[0] == chosen_job:
+                # Replace commas with newlines for proper display in HTML
+                position_data[1] = position_data[1].replace(', ', '\n')  # Responsibilities
+                position_data[2] = position_data[2].replace(', ', '\n')  # Qualifications
+                position_data[3] = position_data[3].replace(', ', '\n')  # Eligibility
+                break
+    return position_data
+
+
 # Function to read open_position.txt and parse data
 def read_positions():
     positions = []
@@ -192,7 +220,32 @@ def call_azure_api(resume_text, job_description):
         return {'evaluation': evaluation, 'details': details}
     else:
         return {"error": "Azure API request failed"}
-    
+
+
+def comparison_azure(candidates_compare_json, job_description):
+    print(candidates_compare_json)
+    print(job_description)
+    headers = {
+        'Content-Type': 'application/json',
+        'api-key': AZURE_API_KEY
+    }
+ 
+    data = {
+        "messages": [
+            {"role": "system", "content": "You are a resume reviewer to rank the talents."},
+            {"role": "user", "content": f"By reviewing the given candidates {candidates_compare_json} and the job description {job_description}. Give me the evaluation of the ranking of the candidates based on the job description."}
+        ]
+    }
+
+    response = requests.post(AZURE_API_URL, headers=headers, json=data)
+
+    if response.status_code == 200:
+        result = response.json()
+        evaluation = result['choices'][0]['message']['content']
+        return evaluation
+    else:
+        return "Evaluation error"
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -289,12 +342,41 @@ def job_matching():
 def schedule():
     return render_template('schedule.html')
 
-@app.route('/comparison')
+@app.route('/comparison', methods=['GET', 'POST'])
+@app.route('/comparison', methods=['GET', 'POST'])
+
 def comparison():
-    return render_template('comparison.html')
+    if request.method == 'POST':
+        compares = request.form['resultText']  # This should now work without KeyError
+        candidates = get_candidates(compares)
+        # Format candidate data for easy rendering
+        formatted_candidates = []
+        for candidate in candidates:
+            formatted_candidates.append({
+                'id': candidate[0],
+                'name': candidate[3],
+                'experience': candidate[7],
+                'education': candidate[8],
+                'hard_skills': candidate[9],
+                'soft_skills': candidate[10],
+                'languages': candidate[11]
+                # Add other fields as needed
+            })
+        job = request.form['applied-job']
+        job_data = get_job(job)
+        evaluation = comparison_azure(formatted_candidates, job_data)
+        print(evaluation)
+        return evaluation 
+    else:
+        candidates = []  # Handle GET request case if needed
+
+    candidates_data = read_candidates()
+    jobs = load_jobs()
+    return render_template('comparison.html', candidates=candidates_data, jobs=jobs)
 
 @app.route('/cv_viewer')
 def cv_viewer():
+
     return render_template('cv_viewer.html')
 
 if __name__ == '__main__':
