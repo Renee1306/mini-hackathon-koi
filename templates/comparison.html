@@ -4,8 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comparison</title>
+<<<<<<< Updated upstream
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+=======
+    <link rel="stylesheet" href="/static/candidates.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+    .popup {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+    }
+
+    .popup-content {
+        background-color: #fff;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* Loading spinner styles */
+    .loading {
+        display: none; /* Hidden initially */
+        position: fixed;
+        z-index: 2; /* Sit above everything */
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .spinner {
+        border: 16px solid #f3f3f3;
+        border-top: 16px solid #000000;
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    </style>
+
+>>>>>>> Stashed changes
 </head>
 <body>
     <div class="container">
@@ -20,7 +84,7 @@
                     <li><a href="{{ url_for('open_position') }}"><i class="fas fa-briefcase"></i> Open Position</a></li>
                     <li><a href="{{ url_for('job_matching') }}"><i class="fas fa-file-alt"></i> Resume Extraction</a></li>
                     <li><a href="{{ url_for('schedule') }}"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
-                    <li><a href="{{ url_for('comparison') }}"class="active"><i class="fas fa-balance-scale"></i> Comparison</a></li>
+                    <li><a href="{{ url_for('comparison') }}" class="active"><i class="fas fa-balance-scale"></i> Comparison</a></li>
                 </ul>
             </nav>
         </div>
@@ -29,8 +93,178 @@
             <header>
                 <h3>Comparison Page</h3>
             </header>
+<<<<<<< Updated upstream
             <p>This is the support page content.</p>
         </div>
     </div>
+=======
+
+<!-- Job filter form -->
+<form method="GET" action="{{ url_for('comparison') }}">
+    <label for="job-filter">Filter by Applied Job:</label>
+    <select id="job-filter" name="applied_job">
+        <option value="">All Jobs</option>
+        {% for job in jobs %}
+            <option value="{{ job['title'] }}" {% if request.args.get('applied_job') == job['title'] %}selected{% endif %}>
+                {{ job['title'] }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+</form>
+
+<button id="openCompareBtn" class="compare-button">Compare</button>
+
+            <!-- Add a table container for horizontal scrolling -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Applied Job</th>
+                            <th>Score</th>
+                            <th>Name</th>
+                            <th>Work Experience</th>
+                            <th>Education</th>
+                            <th>Hard Skills</th>
+                            <th>Soft Skills</th>
+                            <th>Languages</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for candidate in candidates %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="selected_candidate" value="{{ candidate[0] }}"> 
+                                {{ candidate[0] }}
+                            </td>
+                            <td>{{ candidate[1] }}</td>
+                            <td>{{ candidate[2] }}</td>
+                            <td>{{ candidate[3] }}</td>
+                            <td>{{ candidate[7] }}</td>
+                            <td>{{ candidate[8] }}</td>
+                            <td>{{ candidate[9] }}</td>
+                            <td>{{ candidate[10] }}</td>
+                            <td>{{ candidate[11] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div id="popup" class="popup">
+                <div class="popup-content">
+                    <span class="close" id="closePopup">&times;</span>
+                    <form method="POST" action="/comparison">
+                        <h3>Comparison Confirmation</h3>
+                        <p id="resultDisplay"></p> <!-- Display selected candidates here -->
+                        <input type="hidden" id="resultText" name="resultText"> <!-- Hidden input for result text -->
+
+                        <!-- Dropdown for applied job -->
+                        <label for="applied-job">Select Job:</label>
+                        <select id="applied-job" name="applied-job" required>
+                            <option value="">Select a job</option>
+                            {% for job in jobs %}
+                                <option value="{{ job['title'] }}">{{ job['title'] }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <button type="submit">Compare</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="candidateInfoPopup" class="popup" style="display: none;">
+                <div class="popup-content">
+                    <span class="close" id="closeCandidateInfoPopup">&times;</span>
+                    <h3>Candidate Information</h3>
+                    <div id="candidateInfoDisplay"></div> <!-- Placeholder for candidate info -->
+                </div>
+            </div>
+
+            <!-- Loading spinner -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+        </div> <!-- End of main-content -->
+    </div> <!-- End of container -->
+
+    <!-- JavaScript for Popup and Loading Functionality -->
+    <script>
+        // Get the modal for comparison confirmation
+        var popup = document.getElementById("popup");
+        var compareButton = document.getElementById("openCompareBtn");
+        var resultText = document.getElementById("resultText");
+        var closePopup = document.getElementById("closePopup");
+    
+        // Get the modal for candidate information
+        var candidateInfoPopup = document.getElementById("candidateInfoPopup");
+        var closeCandidateInfoPopup = document.getElementById("closeCandidateInfoPopup");
+
+        // Get the loading spinner
+        var loadingSpinner = document.getElementById('loading');
+    
+        // When the user clicks the Compare button, open the modal 
+        compareButton.onclick = function() {
+            // Get all checked checkboxes
+            const checkedCheckboxes = document.querySelectorAll('input[name="selected_candidate"]:checked');
+            
+            // Extract values
+            const selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
+            
+            // Display results in the popup
+            if (selectedValues.length > 0) {
+                const displayString = selectedValues.join(', ');
+                document.getElementById('resultDisplay').textContent = displayString;
+                document.getElementById('resultText').value = displayString;
+    
+                popup.style.display = "block";
+            } else {
+                document.getElementById('resultDisplay').textContent = 'No candidates selected.';
+                document.getElementById('resultText').value = '';
+                popup.style.display = "block";
+            }
+        }
+
+        // Handle form submission via AJAX
+        document.querySelector('#popup form').onsubmit = function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Show loading spinner
+            loadingSpinner.style.display = 'block';
+
+            const formData = new FormData(this); // Get form data
+
+            fetch('/comparison', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('candidateInfoDisplay').innerHTML = data.replace(/\n/g, '<br>');
+
+                candidateInfoPopup.style.display = "block"; // Show candidate info popup
+                popup.style.display = "none"; // Hide original popup
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                loadingSpinner.style.display = 'none'; // Hide loading spinner after processing
+            });
+        }
+
+        // Close Candidate Info Popup
+        closeCandidateInfoPopup.onclick = function() {
+            candidateInfoPopup.style.display = "none";
+        }
+
+        // Close Comparison Popup
+        closePopup.onclick = function() {
+            popup.style.display = "none";
+        }
+    </script>
+>>>>>>> Stashed changes
 </body>
 </html>

@@ -108,7 +108,7 @@
             
             <!-- Drop-down filter for applied jobs -->
             <select id="jobFilter" onchange="filterCandidates()">
-                <option value="">Applied Jobs</option>
+                <option value="">All Jobs</option>
                 {% for job in applied_jobs %}
                 <option value="{{ job }}">{{ job }}</option>
                 {% endfor %}
