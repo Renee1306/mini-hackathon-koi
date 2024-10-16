@@ -4,6 +4,7 @@ import PyPDF2
 import requests
 import re
 import json
+from docx import Document
 
 app = Flask(__name__)
 #hi
@@ -70,6 +71,14 @@ def extract_pdf_text(file_path):
         for page in range(len(reader.pages)):
             text += reader.pages[page].extract_text()
         return text
+
+# Function to extract text from DOCX
+def extract_docx_text(file_path):
+    doc = Document(file_path)
+    full_text = []
+    for paragraph in doc.paragraphs:
+        full_text.append(paragraph.text)
+    return '\n'.join(full_text)
 
 # Function to load job positions from the file
 def load_jobs():
@@ -224,44 +233,52 @@ def job_matching():
         if file.filename == '':
             return jsonify({'error': 'No selected file'}), 400
 
-        if file and file.filename.endswith('.pdf'):
-            file_path = os.path.join('uploads', file.filename)
+        # Check if the file is PDF or DOCX
+        file_ext = os.path.splitext(file.filename)[1].lower()
+        file_path = os.path.join('uploads', file.filename)
+
+        if file_ext == '.pdf':
             file.save(file_path)
-
             resume_text = extract_pdf_text(file_path)
+        elif file_ext == '.docx':
+            file.save(file_path)
+            resume_text = extract_docx_text(file_path)
+        else:
+            return jsonify({'error': 'Unsupported file format. Please upload a PDF or DOCX file.'}), 400
 
-            jobs = load_jobs()
-            selected_job = next((job for job in jobs if job['title'] == applied_job), None)
+        # Find the selected job and its description
+        jobs = load_jobs()
+        selected_job = next((job for job in jobs if job['title'] == applied_job), None)
 
-            if not selected_job:
-                return jsonify({'error': 'Job not found'}), 404
+        if not selected_job:
+            return jsonify({'error': 'Job not found'}), 404
 
-            job_description = f"{selected_job['description']} {selected_job['qualification']} {selected_job['experience']} {selected_job['hard_skills']}{selected_job['soft_skills']}"
+        job_description = f"{selected_job['description']} {selected_job['qualification']} {selected_job['experience']} {selected_job['hard_skills']}{selected_job['soft_skills']}"
 
-            # Send the resume and job description to Azure OpenAI
-            azure_response = call_azure_api(resume_text, job_description)
+        # Send the resume and job description to Azure OpenAI
+        azure_response = call_azure_api(resume_text, job_description)
 
-            if 'error' in azure_response:
-                return jsonify({'error': azure_response['error']}), 500
+        if 'error' in azure_response:
+            return jsonify({'error': azure_response['error']}), 500
 
-            # Extract details from the response
-            candidate_details = azure_response['details']
-            evaluation = azure_response['evaluation']
+        # Extract details from the response
+        candidate_details = azure_response['details']
+        evaluation = azure_response['evaluation']
 
-            # Generate a unique candidate ID (incremental based on current file size)
-            candidates = read_candidates()
-            candidate_id = f"C{str(len(candidates) + 1).zfill(4)}"
-            absolute_file_path = os.path.abspath(file_path).replace("\\", "/")
+        # Generate a unique candidate ID (incremental based on current file size)
+        candidates = read_candidates()
+        candidate_id = f"C{str(len(candidates) + 1).zfill(4)}"
+        absolute_file_path = os.path.abspath(file_path).replace("\\", "/")
 
-            # Save the candidate's details into candidates.txt
-            with open('database/candidates.txt', 'a') as file:
-                file.write(f"{candidate_id}|{applied_job}|{candidate_details['score']}|{candidate_details['name']}|{candidate_details['phone']}|{candidate_details['email']}|{candidate_details['location']}|{candidate_details['work_experience']}|{candidate_details['education']}|{candidate_details['hard_skills']}|{candidate_details['soft_skills']}|{candidate_details['languages']}|{candidate_details['project_links']}|In-Progress|{absolute_file_path}\n")
+        # Save the candidate's details into candidates.txt
+        with open('database/candidates.txt', 'a') as file:
+            file.write(f"{candidate_id}|{applied_job}|{candidate_details['score']}|{candidate_details['name']}|{candidate_details['phone']}|{candidate_details['email']}|{candidate_details['location']}|{candidate_details['work_experience']}|{candidate_details['education']}|{candidate_details['hard_skills']}|{candidate_details['soft_skills']}|{candidate_details['languages']}|{candidate_details['project_links']}|In-Progress|{absolute_file_path}\n")
 
-            # Return evaluation and extracted details
-            return jsonify({
-                'evaluation': evaluation,
-                'details': candidate_details
-            })
+        # Return evaluation and extracted details
+        return jsonify({
+            'evaluation': evaluation,
+            'details': candidate_details
+        })
 
     # Load available jobs for dropdown selection
     jobs = load_jobs()
