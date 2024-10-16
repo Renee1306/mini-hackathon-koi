@@ -45,6 +45,8 @@
                 <p><strong>Key Responsibilities:</strong> {{ position[1] }}</p>
                 <p><strong>Qualifications:</strong> {{ position[2] }}</p>
                 <p><strong>Eligibility:</strong> {{ position[3] }}</p>
+                <p><strong>Hard Skills:</strong> {{ position[4] }}</p>
+                <p><strong>Soft Skills:</strong> {{ position[5] }}</p>
             </div>
             {% endfor %}
 
@@ -65,6 +67,12 @@
 
                         <label for="eligibility">Eligibility:</label><br>
                         <textarea id="eligibility" name="eligibility" required></textarea><br><br>
+                       
+                        <label for="hard_skills">Hard Skills:</label><br>
+                        <textarea id="hard_skills" name="hard_skills" required></textarea><br><br>
+                      
+                        <label for="soft_skills">Soft Skills:</label><br>
+                        <textarea id="soft_skills" name="soft_skills" required></textarea><br><br>
 
                         <button type="submit">Submit</button>
                     </form>

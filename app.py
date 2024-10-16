@@ -6,7 +6,7 @@ import re
 import json
 
 app = Flask(__name__)
-
+#hi
 AZURE_API_KEY = "b29894cc56df42bdbd5a5dd270d97171"
 AZURE_API_URL = "https://minihackathon01.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-08-01-preview"
 
@@ -33,6 +33,9 @@ def read_positions():
             position_data[1] = position_data[1].replace(', ', '\n')  # Responsibilities
             position_data[2] = position_data[2].replace(', ', '\n')  # Qualifications
             position_data[3] = position_data[3].replace(', ', '\n')  # Eligibility
+            position_data[4] = position_data[4].replace(', ', '\n')  # Eligibility
+            position_data[5] = position_data[5].replace(', ', '\n')  # Eligibility
+
             positions.append(position_data)
     return positions
 
@@ -78,7 +81,9 @@ def load_jobs():
                 'title': parts[0],
                 'description': parts[1],
                 'qualification': parts[2],
-                'experience': parts[3]
+                'experience': parts[3],
+                'hard_skills': parts[4],
+                'soft_skills': parts[5]
             }
             jobs.append(job)
     return jobs
@@ -195,7 +200,10 @@ def open_position():
         responsibilities = request.form['responsibilities']
         qualifications = request.form['qualifications']
         eligibility = request.form['eligibility']
-        write_position(job_title, responsibilities, qualifications, eligibility)
+        hard_skills = request.form['hard_skills']
+        soft_skills = request.form['soft_skills']
+
+        write_position(job_title, responsibilities, qualifications, eligibility,hard_skills,soft_skills)
         return redirect(url_for('open_position'))
 
     # Capture search input from the 'GET' request
@@ -228,7 +236,7 @@ def job_matching():
             if not selected_job:
                 return jsonify({'error': 'Job not found'}), 404
 
-            job_description = f"{selected_job['description']} {selected_job['qualification']} {selected_job['experience']}"
+            job_description = f"{selected_job['description']} {selected_job['qualification']} {selected_job['experience']} {selected_job['hard_skills']}{selected_job['soft_skills']}"
 
             # Send the resume and job description to Azure OpenAI
             azure_response = call_azure_api(resume_text, job_description)
