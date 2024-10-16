@@ -6,6 +6,7 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="static/common.css">
     <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -18,12 +19,12 @@
                 <ul>
                     <nav>
                         <ul>
-                            <li><a href="{{ url_for('index') }}" class="active">Dashboard</a></li>
-                            <li><a href="{{ url_for('candidates') }}">Candidates</a></li>
-                            <li><a href="{{ url_for('open_position') }}">Open Position</a></li>
-                            <li><a href="{{ url_for('job_matching') }}">Resume Extraction</a></li>
-                            <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
-                            <li><a href="{{ url_for('comparison') }}">Comparison</a></li>
+                            <li><a href="{{ url_for('index') }}"class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                            <li><a href="{{ url_for('candidates') }}" ><i class="fas fa-users"></i> Candidates</a></li>
+                            <li><a href="{{ url_for('open_position') }}"><i class="fas fa-briefcase"></i> Open Position</a></li>
+                            <li><a href="{{ url_for('job_matching') }}"><i class="fas fa-file-alt"></i> Resume Extraction</a></li>
+                            <li><a href="{{ url_for('schedule') }}"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
+                            <li><a href="{{ url_for('comparison') }}"><i class="fas fa-balance-scale"></i> Comparison</a></li>
                         </ul>
                     </nav>
                                    

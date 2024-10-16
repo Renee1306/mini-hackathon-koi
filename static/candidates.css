@@ -51,16 +51,18 @@ html, body {
 
 table {
     width: 100%;
-    min-width: 1200px; /* Ensure the table has a minimum width for scrolling */
+    min-width: 1200px; 
     border-collapse: collapse;
     margin-top: 20px;
+    background-color: #ffffff;
 }
 
 th, td {
     padding: 12px 15px;
     text-align: left;
     border: 1px solid #ddd;
-    font-size: 12px; 
+    font-size: 12px;
+    background-color: #ffffff;
 }
 
 th {
@@ -106,3 +108,22 @@ td {
     width: 100%;
 }
 
+#jobFilter {
+    width: 200px; /* Set a specific width */
+    padding: 8px 12px; /* Add padding for better look */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 4px; /* Rounded corners */
+    background-color: #fff; /* White background */
+    font-size: 14px; /* Adjust font size */
+    color: #333; /* Text color */
+    margin-top: 20px; /* Add some space on top */
+    margin-bottom: 20px; /* Add some space below */
+    display: block; /* Ensure it's displayed as a block element */
+}
+
+#jobFilter:hover, 
+#jobFilter:focus {
+    border-color: #007bff; /* Change border color on hover and focus */
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add subtle shadow */
+}

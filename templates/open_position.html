@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Open Position</title>
     <link rel="stylesheet" href="/static/open_position.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -14,12 +15,12 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="{{ url_for('index') }}">Dashboard</a></li>
-                    <li><a href="{{ url_for('candidates') }}">Candidates</a></li>
-                    <li><a href="{{ url_for('open_position') }}" class="active">Open Position</a></li>
-                    <li><a href="{{ url_for('job_matching') }}">Resume Extraction</a></li>
-                    <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
-                    <li><a href="{{ url_for('comparison') }}">Comparison</a></li>
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="{{ url_for('candidates') }}" ><i class="fas fa-users"></i> Candidates</a></li>
+                    <li><a href="{{ url_for('open_position') }}"class="active"><i class="fas fa-briefcase"></i> Open Position</a></li>
+                    <li><a href="{{ url_for('job_matching') }}"><i class="fas fa-file-alt"></i> Resume Extraction</a></li>
+                    <li><a href="{{ url_for('schedule') }}"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
+                    <li><a href="{{ url_for('comparison') }}"><i class="fas fa-balance-scale"></i> Comparison</a></li>
                 </ul>
             </nav>
         </div>
@@ -45,6 +46,8 @@
                 <p><strong>Key Responsibilities:</strong> {{ position[1] }}</p>
                 <p><strong>Qualifications:</strong> {{ position[2] }}</p>
                 <p><strong>Eligibility:</strong> {{ position[3] }}</p>
+                <p><strong>Hard Skills:</strong> {{ position[4] }}</p>
+                <p><strong>Soft Skills:</strong> {{ position[5] }}</p>
             </div>
             {% endfor %}
 
@@ -65,6 +68,12 @@
 
                         <label for="eligibility">Eligibility:</label><br>
                         <textarea id="eligibility" name="eligibility" required></textarea><br><br>
+                       
+                        <label for="hard_skills">Hard Skills:</label><br>
+                        <textarea id="hard_skills" name="hard_skills" required></textarea><br><br>
+                      
+                        <label for="soft_skills">Soft Skills:</label><br>
+                        <textarea id="soft_skills" name="soft_skills" required></textarea><br><br>
 
                         <button type="submit">Submit</button>
                     </form>

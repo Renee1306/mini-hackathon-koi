@@ -5,40 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comparison</title>
     <link rel="stylesheet" href="/static/style.css">
-    <style>
-        /* Add styles for the popup */
-        .popup {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
-        }
 
-        .popup-content {
-            background-color: #fff;
-            margin: 15% auto; /* 15% from the top and centered */
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%; /* Could be more or less, depending on screen size */
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -49,12 +16,12 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="{{ url_for('index') }}">Dashboard</a></li>
-                    <li><a href="{{ url_for('candidates') }}">Candidates</a></li>
-                    <li><a href="{{ url_for('open_position') }}">Open Position</a></li>
-                    <li><a href="{{ url_for('job_matching') }}">Resume Extraction</a></li>
-                    <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
-                    <li><a href="{{ url_for('comparison') }}" class="active">Comparison</a></li>
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="{{ url_for('candidates') }}" ><i class="fas fa-users"></i> Candidates</a></li>
+                    <li><a href="{{ url_for('open_position') }}"><i class="fas fa-briefcase"></i> Open Position</a></li>
+                    <li><a href="{{ url_for('job_matching') }}"><i class="fas fa-file-alt"></i> Resume Extraction</a></li>
+                    <li><a href="{{ url_for('schedule') }}"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
+                    <li><a href="{{ url_for('comparison') }}"class="active"><i class="fas fa-balance-scale"></i> Comparison</a></li>
                 </ul>
             </nav>
         </div>
