@@ -127,3 +127,71 @@ td {
     outline: none; /* Remove default outline */
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add subtle shadow */
 }
+
+.compare-button {
+    background-color: #000000; /* Green background */
+    border: none; /* Remove border */
+    color: white; /* White text */
+    padding: 10px 20px; /* Add padding */
+    text-align: center; /* Center text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Make the button inline */
+    font-size: 15px; /* Set font size */
+    margin: 4px 2px; /* Add some margin */
+    margin-top: 15px;
+    cursor: pointer; /* Add pointer cursor on hover */
+    border-radius: 8px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition for hover */
+}
+
+.compare-button:hover {
+    color:#000000;
+    background-color: #8e8e8e; /* Darker green when hovered */
+}
+
+label {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.popup-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-height: 80%; /* Add a max height to control the content height */
+    overflow-y: auto; /* Enables vertical scrolling */
+}
+
+#candidateInfoDisplay {
+    max-height: 300px; /* Set a maximum height for the text box */
+    overflow-y: auto; /* Enable vertical scroll if the content exceeds the height */
+    padding: 10px;
+    border: 1px solid #ccc; /* Optional: to visually separate the content box */
+    background-color: #f9f9f9; /* Optional: Background color for the content area */
+}
+
+.evaluation-container {
+    margin-top: 10px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.evaluation-container h4 {
+    margin-bottom: 10px;
+}
+
+.evaluation-container ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.evaluation-container ul li {
+    margin-bottom: 10px;
+}
