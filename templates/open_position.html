@@ -56,24 +56,27 @@
                 <div class="modal-content">
                     <span class="close">&times;</span>
                     <h3>Add New Job Position</h3>
-                    <form method="POST">
+                    <form id="jd-form" method="POST" enctype="multipart/form-data">
+                        <label for="jd">Job Title:</label><br>
+                        <input type="file" id="jd" name="jd" accept=".pdf, .docx">
+
                         <label for="job_title">Job Title:</label><br>
-                        <input type="text" id="job_title" name="job_title" required><br><br>           
+                        <input type="text" id="job_title" name="job_title"><br><br>           
 
                         <label for="responsibilities">Key Responsibilities:</label><br>
-                        <textarea id="responsibilities" name="responsibilities" required></textarea><br><br>
+                        <textarea id="responsibilities" name="responsibilities"></textarea><br><br>
 
                         <label for="qualifications">Qualifications:</label><br>
-                        <textarea id="qualifications" name="qualifications" required></textarea><br><br>
+                        <textarea id="qualifications" name="qualifications"></textarea><br><br>
 
                         <label for="eligibility">Eligibility:</label><br>
-                        <textarea id="eligibility" name="eligibility" required></textarea><br><br>
+                        <textarea id="eligibility" name="eligibility"></textarea><br><br>
                        
                         <label for="hard_skills">Hard Skills:</label><br>
-                        <textarea id="hard_skills" name="hard_skills" required></textarea><br><br>
+                        <textarea id="hard_skills" name="hard_skills"></textarea><br><br>
                       
                         <label for="soft_skills">Soft Skills:</label><br>
-                        <textarea id="soft_skills" name="soft_skills" required></textarea><br><br>
+                        <textarea id="soft_skills" name="soft_skills"></textarea><br><br>
 
                         <button type="submit">Submit</button>
                     </form>
