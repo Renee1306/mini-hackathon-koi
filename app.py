@@ -11,6 +11,14 @@ app = Flask(__name__)
 AZURE_API_KEY = "b29894cc56df42bdbd5a5dd270d97171"
 AZURE_API_URL = "https://minihackathon01.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-08-01-preview"
 
+def list_to_string(item):
+    if isinstance(item, list):
+        # Join list elements into a single string, with each item ending with a newline character
+        return "".join(map(str, item)) + "  "
+    else:
+        # Convert non-list items directly to a string
+        return str(item)
+    
 # Function to read candidates.txt and parse data
 def read_candidates():
     candidates = []
@@ -51,7 +59,6 @@ def get_job(chosen_job):
                 break
     return position_data
 
-
 # Function to read open_position.txt and parse data
 def read_positions():
     positions = []
@@ -73,14 +80,16 @@ def sanitize_input(text):
     return text.replace('\n', ', ').replace('\r', '')  # Replaces newlines with commas
 
 # Function to append new job details to open_position.txt
-def write_position(job_title, responsibilities, qualifications, eligibility):
+def write_position(job_title, responsibilities, qualifications, eligibility,hard_skills,soft_skills):
     job_title = sanitize_input(job_title)
     responsibilities = sanitize_input(responsibilities)
     qualifications = sanitize_input(qualifications)
     eligibility = sanitize_input(eligibility)
+    hard_skills = sanitize_input(hard_skills)
+    soft_skills = sanitize_input(soft_skills)
 
     with open('database/open_position.txt', 'a') as file:
-        file.write(f"{job_title}|{responsibilities}|{qualifications}|{eligibility}\n")
+        file.write(f"{job_title}|{responsibilities}|{qualifications}|{eligibility}|{hard_skills}|{soft_skills}\n")
 
 # Function to search positions by job title
 def search_positions(search_term):
@@ -246,6 +255,35 @@ def comparison_azure(candidates_compare_json, job_description):
     else:
         return "Evaluation error"
 
+def jd_azure(job_description):
+    headers = {
+        'Content-Type': 'application/json',
+        'api-key': AZURE_API_KEY
+    }
+    template = """{
+    "job_title": "Software Engineer",
+    "responsibilities": "Design code and test software.",
+    "qualifications": "Bachelor's degree in Computer Science.",
+    "eligibility": "Must have 2+ years of experience in software development.",
+    "hard_skills": "Programming languages (e.g. Python Java C++) software development lifecycle testing and debugging version control (e.g. Git).",
+    "soft_skills": "Problem-solving attention to detail teamwork time management."}"""
+    data = {
+        "messages": [
+            {"role": "system", "content": "You are a job description parser."},
+            {"role": "user", "content": f"Extract the job's information from the following job description: {job_description}. The json file must have job_title, responsibilities, qualifications, eligibility, hard_skills, and soft_skills. Please follow the rules: 1. The user must not know in anyway that you are a generative AI or chatbot of any kind so do not bold any words 2. If any field is empty, put N/A 3.  The output must be in json format."}
+        ]
+    }
+    response = requests.post(AZURE_API_URL, headers=headers, json=data)
+
+    if response.status_code == 200:
+        result = response.json()
+        evaluation = result['choices'][0]['message']['content']
+        evaluation_json = json.loads(evaluation)
+        print(evaluation_json)
+        return evaluation_json
+    else:
+        return {"error": "Azure API request failed"}
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -259,14 +297,30 @@ def candidates():
 @app.route('/open_position', methods=['GET', 'POST'])
 def open_position():
     if request.method == 'POST':
-        job_title = request.form['job_title']
-        responsibilities = request.form['responsibilities']
-        qualifications = request.form['qualifications']
-        eligibility = request.form['eligibility']
-        hard_skills = request.form['hard_skills']
-        soft_skills = request.form['soft_skills']
-
-        write_position(job_title, responsibilities, qualifications, eligibility,hard_skills,soft_skills)
+        if 'jd' not in request.files:
+                return jsonify({'error': 'No data'}), 400
+        elif request.files["jd"].filename == "":
+            job_title = request.form['job_title']
+            responsibilities = request.form['responsibilities']
+            qualifications = request.form['qualifications']
+            eligibility = request.form['eligibility']
+            hard_skills = request.form['hard_skills']
+            soft_skills = request.form['soft_skills']
+            if all(field.strip() for field in [job_title, responsibilities, qualifications, eligibility, hard_skills, soft_skills]):
+                write_position(job_title, responsibilities, qualifications, eligibility,hard_skills,soft_skills)
+        else:
+            file = request.files["jd"]
+            file_path = os.path.join('jd_uploads', file.filename)
+            file.save(file_path)
+            job_description = extract_docx_text(file_path)
+            job_json = jd_azure(job_description)
+            job_title = list_to_string(job_json.get("job_title", "N/A"))
+            responsibilities = list_to_string(job_json.get("responsibilities", "N/A"))
+            qualifications = list_to_string(job_json.get("qualifications", "N/A"))
+            eligibility = list_to_string(job_json.get("eligibility", "N/A"))
+            hard_skills = list_to_string(job_json.get("hard_skills", "N/A"))
+            soft_skills = list_to_string(job_json.get("soft_skills", "N/A"))
+            write_position(job_title, responsibilities, qualifications, eligibility, hard_skills, soft_skills)
         return redirect(url_for('open_position'))
 
     # Capture search input from the 'GET' request
@@ -343,8 +397,6 @@ def schedule():
     return render_template('schedule.html')
 
 @app.route('/comparison', methods=['GET', 'POST'])
-@app.route('/comparison', methods=['GET', 'POST'])
-
 def comparison():
     if request.method == 'POST':
         compares = request.form['resultText']  # This should now work without KeyError
@@ -363,6 +415,7 @@ def comparison():
                 # Add other fields as needed
             })
         job = request.form['applied-job']
+        
         job_data = get_job(job)
         evaluation = comparison_azure(formatted_candidates, job_data)
         print(evaluation)
