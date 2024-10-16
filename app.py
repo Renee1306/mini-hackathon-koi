@@ -127,7 +127,7 @@ def call_azure_api(resume_text, job_description):
     data = {
         "messages": [
             {"role": "system", "content": "You are a resume parser."},
-            {"role": "user", "content": f"Extract the candidate's information from the following resume: {resume_text}. Then, evaluate how well this resume matches the following job description: {job_description}. Provide a score out of 100. Education: Pick only the highest title/course. Work Experience: Pick at most three relevant work experiences.Project Links: Only extract the relevant URL. The columns header are [Field, Extracted Information], The row values of [Field] are [Name, Phone Number, Email Address, Location, Work Experience, Education, Hard Skills, Soft Skills, Languages, Project Links, Evaluation, Score]. Please follow the rules: 1. The user must not know in anyway that you are a generative AI or chatbot of any kind so do not bold any words 2. If any row data is empty, Put N/A 3.  The output must be in json format like {template}."}
+            {"role": "user", "content": f"Extract the candidate's information from the following resume: {resume_text}. Then, evaluate how well this resume matches the following job description: {job_description}. Provide a score out of 100. Education: Pick only the highest title/course. Work Experience: Pick at most three relevant work experiences.Project Links: Only extract the relevant URL. Evaluation: Give proper evaluation of the resume based on the job description. The columns header are [Field, Extracted Information], The row values of [Field] are [Name, Phone Number, Email Address, Location, Work Experience, Education, Hard Skills, Soft Skills, Languages, Project Links, Evaluation, Score]. Please follow the rules: 1. The user must not know in anyway that you are a generative AI or chatbot of any kind so do not bold any words 2. If any row data is empty, Put N/A 3.  The output must be in json format like {template}."}
         ]
     }
 
@@ -138,20 +138,36 @@ def call_azure_api(resume_text, job_description):
         evaluation = result['choices'][0]['message']['content']
         evaluation_json = json.loads(evaluation)
         print(evaluation)
+
+        try:
+            education = [
+                f'Title: {edu.get("Title", "N/A")}, Institution: {edu.get("Institution", "N/A")}'
+                for edu in evaluation_json.get("Education", [])
+            ]
+            if not education:
+                education = "N/A"
+        except Exception:
+            education = "N/A"
+        
+        try:
+            work_experience = [
+                f'Job Title: {exp.get("Job Title", "N/A")}, Company: {exp.get("Company", "N/A")}, Duration: {exp.get("Duration", "N/A")}'
+                for exp in evaluation_json.get("Work Experience", [])
+            ]
+            if not work_experience:
+                work_experience = "N/A"
+        except Exception:
+            work_experience = "N/A"
         # Use regular expressions to extract the needed information
         details = {
             'name': evaluation_json.get("Name", "N/A"),
             'phone': evaluation_json.get("Phone Number", "N/A"),
             'email': evaluation_json.get("Email Address", "N/A"),
             'location': evaluation_json.get("Location", "N/A"),
-            'work_experience': [
-                f'Job Title: {exp["Job Title"]}, Company: {exp["Company"]}, Duration: {exp["Duration"]}'
-                for exp in evaluation_json.get("Work Experience", [])
-            ],
-            'education': [
-                f'Title: {edu["Title"]}, Institution: {edu["Institution"]}'
-                for edu in evaluation_json.get("Education", [])
-            ],
+            # For work_experience
+            "work_experience": work_experience,
+            # For education
+            "education": education,
             'hard_skills': evaluation_json.get("Hard Skills", "N/A"),
             'soft_skills': evaluation_json.get("Soft Skills", "N/A"),
             'languages': evaluation_json.get("Languages", "N/A"),
@@ -247,9 +263,9 @@ def job_matching():
 def schedule():
     return render_template('schedule.html')
 
-@app.route('/support')
-def support():
-    return render_template('support.html')
+@app.route('/comparison')
+def comparison():
+    return render_template('comparison.html')
 
 @app.route('/cv_viewer')
 def cv_viewer():
