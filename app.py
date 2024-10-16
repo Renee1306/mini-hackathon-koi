@@ -319,11 +319,57 @@ def suggest_similar_jobs(resume_text):
 def schedule():
     return render_template('schedule.html')
 
-<<<<<<< Updated upstream
-@app.route('/comparison')
-def comparison():
-    return render_template('comparison.html')
-=======
+def get_candidates(selected_string):
+    selected_list = selected_string.split(', ')
+    candidates = []
+    with open('database/candidates.txt', 'r') as file:
+        for select in selected_list:
+            for line in file:
+                # Split each line by the '|' character and store it as a list
+                candidate_data = line.strip().split('|')
+                if candidate_data[0] == select:
+                    candidate_data[14]= "file:///" + candidate_data[14].replace(" ", "%20").replace("\\", "/")
+                    print("Link" + candidate_data[14])
+                    candidates.append(candidate_data)
+                    break
+    return candidates
+
+def get_job(chosen_job):
+    with open('database/open_position.txt', 'r') as file:
+        for line in file:
+            position_data = line.strip().split('|')
+            if position_data[0] == chosen_job:
+                # Replace commas with newlines for proper display in HTML
+                position_data[1] = position_data[1].replace(', ', '\n')  # Responsibilities
+                position_data[2] = position_data[2].replace(', ', '\n')  # Qualifications
+                position_data[3] = position_data[3].replace(', ', '\n')  # Eligibility
+                break
+    return position_data
+
+def comparison_azure(candidates_compare_json, job_description):
+    print(candidates_compare_json)
+    print(job_description)
+    headers = {
+        'Content-Type': 'application/json',
+        'api-key': AZURE_API_KEY
+    }
+ 
+    data = {
+        "messages": [
+            {"role": "system", "content": "You are a resume reviewer to rank the talents."},
+            {"role": "user", "content": f"By reviewing the given candidates {candidates_compare_json} and the job description {job_description}. Give me the evaluation of the ranking of the candidates based on the job description."}
+        ]
+    }
+
+    response = requests.post(AZURE_API_URL, headers=headers, json=data)
+
+    if response.status_code == 200:
+        result = response.json()
+        evaluation = result['choices'][0]['message']['content']
+        return evaluation
+    else:
+        return "Evaluation error"
+    
 @app.route('/comparison', methods=['GET', 'POST'])
 def comparison():
     if request.method == 'POST':
@@ -358,7 +404,6 @@ def comparison():
         jobs = load_jobs()  # Load the jobs for dropdown
 
         return render_template('comparison.html', candidates=candidates_data, jobs=jobs)
->>>>>>> Stashed changes
 
 @app.route('/cv_viewer')
 def cv_viewer():
