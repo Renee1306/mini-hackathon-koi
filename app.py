@@ -7,9 +7,8 @@ import json
 
 app = Flask(__name__)
 
-# Azure API details
-AZURE_API_KEY = os.getenv('AZURE_API_KEY', '4960b7d3c80e4043a9849ea4a5add5d8')
-AZURE_API_URL = os.getenv('AZURE_API_URL', 'https://resume-scanner.openai.azure.com/openai/deployments/gpt-35-turbo-16k/chat/completions?api-version=2024-08-01-preview')
+AZURE_API_KEY = "b29894cc56df42bdbd5a5dd270d97171"
+AZURE_API_URL = "https://minihackathon01.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-08-01-preview"
 
 # Function to read candidates.txt and parse data
 def read_candidates():
