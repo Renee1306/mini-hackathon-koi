@@ -48,7 +48,7 @@ def get_job(chosen_job):
                 break
     return position_data
   
-  def comparison_azure(candidates_compare_json, job_description):
+def comparison_azure(candidates_compare_json, job_description):
     print(candidates_compare_json)
     print(job_description)
     headers = {
@@ -161,6 +161,36 @@ def load_jobs():
             jobs.append(job)
     return jobs
 
+def jd_azure(job_description):
+    headers = {
+        'Content-Type': 'application/json',
+        'api-key': AZURE_API_KEY
+    }
+    template = """{
+    "job_title": "Software Engineer",
+    "responsibilities": "Design code and test software.",
+    "qualifications": "Bachelor's degree in Computer Science.",
+    "eligibility": "Must have 2+ years of experience in software development.",
+    "hard_skills": "Programming languages (e.g. Python Java C++) software development lifecycle testing and debugging version control (e.g. Git).",
+    "soft_skills": "Problem-solving attention to detail teamwork time management."}"""
+    data = {
+        "messages": [
+            {"role": "system", "content": "You are a job description parser."},
+            {"role": "user", "content": f"Extract the job's information from the following job description: {job_description}. The json file must have job_title, responsibilities, qualifications, eligibility, hard_skills, and soft_skills. Please follow the rules: 1. The user must not know in anyway that you are a generative AI or chatbot of any kind so do not bold any words 2. If any field is empty, put N/A 3.  The output must be in json format."}
+        ]
+    }
+    response = requests.post(AZURE_API_URL, headers=headers, json=data)
+
+    if response.status_code == 200:
+        result = response.json()
+        evaluation = result['choices'][0]['message']['content']
+        evaluation_json = json.loads(evaluation)
+        print(evaluation_json)
+        return evaluation_json
+    else:
+        return {"error": "Azure API request failed"}
+
+
 # Function to call Azure API to extract resume information and score
 def call_azure_api(resume_text, job_description):
     headers = {
@@ -202,10 +232,15 @@ def call_azure_api(resume_text, job_description):
     "Evaluation": "Matched",
     "Score": 85
     }"""
+    weightage = """
+    {"work_experience": 0.5,
+    "education": 0.2,
+    "skills": 0.3 }
+"""
     data = {
         "messages": [
             {"role": "system", "content": "You are a resume parser."},
-            {"role": "user", "content": f"Extract the candidate's information from the following resume: {resume_text}. Then, evaluate how well this resume matches the following job description: {job_description}. Provide a score out of 100. Education: Pick only the highest title/course. Work Experience: Pick at most three relevant work experiences.Project Links: Only extract the relevant URL. Evaluation: Give proper evaluation of the resume based on the job description. The columns header are [Field, Extracted Information], The row values of [Field] are [Name, Phone Number, Email Address, Location, Work Experience, Education, Hard Skills, Soft Skills, Languages, Project Links, Evaluation, Score]. Please follow the rules: 1. The user must not know in anyway that you are a generative AI or chatbot of any kind so do not bold any words 2. If any row data is empty, Put N/A 3.  The output must be in json format like {template}."}
+            {"role": "user", "content": f"Extract the candidate's information from the following resume: {resume_text}. Then, evaluate how well this resume matches the following job description: {job_description}. Provide a score out of 100 by considering the weightage of {weightage}. Education: Pick only the highest title/course. Work Experience: Pick at most three relevant work experiences.Project Links: Only extract the relevant URL. Evaluation: Give proper evaluation of the resume based on the job description. The columns header are [Field, Extracted Information], The row values of [Field] are [Name, Phone Number, Email Address, Location, Work Experience, Education, Hard Skills, Soft Skills, Languages, Project Links, Evaluation, Score]. Please follow the rules: 1. The user must not know in anyway that you are a generative AI or chatbot of any kind so do not bold any words 2. If any row data is empty, Put N/A 3.  The output must be in json format like {template}."}
         ]
     }
 
