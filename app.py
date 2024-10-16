@@ -200,7 +200,8 @@ def index():
 @app.route('/candidates')
 def candidates():
     candidates_data = read_candidates()
-    return render_template('candidates.html', candidates=candidates_data)
+    applied_jobs = sorted(list(set(candidate[1] for candidate in candidates_data)))
+    return render_template('candidates.html', candidates=candidates_data, applied_jobs=applied_jobs)
 
 @app.route('/open_position', methods=['GET', 'POST'])
 def open_position():
