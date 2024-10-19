@@ -8,3 +8,4 @@ werkzeug
 requests
 python-magic
 python-docx
+pydoc

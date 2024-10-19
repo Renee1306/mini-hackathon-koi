@@ -95,8 +95,8 @@
     <select id="job-filter" name="applied_job">
         <option value="">All Jobs</option>
         {% for job in jobs %}
-            <option value="{{ job['title'] }}" {% if request.args.get('applied_job') == job['title'] %}selected{% endif %}>
-                {{ job['title'] }}
+            <option value="{{ job.get("job_title") }}" {% if request.args.get('applied_job') == job.get("job_title") %}selected{% endif %}>
+                {{ job.get("job_title") }}
             </option>
         {% endfor %}
     </select>
@@ -125,17 +125,17 @@
                         {% for candidate in candidates %}
                         <tr>
                             <td>
-                                <input type="checkbox" name="selected_candidate" value="{{ candidate[0] }}"> 
-                                {{ candidate[0] }}
+                                <input type="checkbox" name="selected_candidate" value="{{ candidate.get("id") }}"> 
+                                {{ candidate.get("id") }}
                             </td>
-                            <td>{{ candidate[1] }}</td>
-                            <td>{{ candidate[2] }}</td>
-                            <td>{{ candidate[3] }}</td>
-                            <td>{{ candidate[7] }}</td>
-                            <td>{{ candidate[8] }}</td>
-                            <td>{{ candidate[9] }}</td>
-                            <td>{{ candidate[10] }}</td>
-                            <td>{{ candidate[11] }}</td>
+                            <td>{{ candidate.get("applied_job") }}</td>
+                            <td>{{ candidate.get("score") }}</td>
+                            <td>{{ candidate.get("name") }}</td>
+                            <td>{{ candidate.get("work_experience") }}</td>
+                            <td>{{ candidate.get("education") }}</td>
+                            <td>{{ candidate.get("hard_skills") }}</td>
+                            <td>{{ candidate.get("soft_skills") }}</td>
+                            <td>{{ candidate.get("languages") }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -156,7 +156,7 @@
                         <select id="applied-job" name="applied-job" required>
                             <option value="">Select a job</option>
                             {% for job in jobs %}
-                                <option value="{{ job['title'] }}">{{ job['title'] }}</option>
+                                <option value="{{ job.get("job_title") }}">{{ job.get("job_title") }}</option>
                             {% endfor %}
                         </select>
 

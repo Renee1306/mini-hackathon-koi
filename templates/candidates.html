@@ -110,7 +110,7 @@
             <select id="jobFilter" onchange="filterCandidates()">
                 <option value="">All Jobs</option>
                 {% for job in applied_jobs %}
-                <option value="{{ job }}">{{ job }}</option>
+                <option value="{{ job}}">{{ job }}</option>
                 {% endfor %}
             </select>
 
@@ -143,20 +143,28 @@
                     <tbody>
                         {% for candidate in candidates %}
                         <tr>
-                            <td>{{ candidate[0] }}</td>
-                            <td>{{ candidate[1] }}</td>
-                            <td>{{ candidate[2] }}</td>
-                            <td>{{ candidate[3] }}</td>
-                            <td>{{ candidate[4] }}</td>
-                            <td>{{ candidate[5] }}</td>
-                            <td>{{ candidate[6] }}</td>
-                            <td>{{ candidate[7] }}</td>
-                            <td>{{ candidate[8] }}</td>
-                            <td>{{ candidate[9] }}</td>
-                            <td>{{ candidate[10] }}</td>
-                            <td>{{ candidate[11] }}</td>
-                            <td><a href="{{ candidate[12] }}" target="_blank">Link</a></td>
-                            <td><span class="status {{ candidate[13]|lower }}">{{ candidate[13] }}</span></td>
+                            <td>{{ candidate.get("id") }}</td>
+                            <td>{{ candidate.get("applied_job") }}</td>
+                            <td>{{ candidate.get("score") }}</td>
+                            <td>{{ candidate.get("name") }}</td>
+                            <td>{{ candidate.get("phone") }}</td>
+                            <td>{{ candidate.get("email") }}</td>
+                            <td>{{ candidate.get("location") }}</td>
+                            <td>
+                                {% for experience in candidate.get("work_experience", []) %}
+                                    {{ experience }}<br>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for experience in candidate.get("education", []) %}
+                                    {{ experience }}<br>
+                                {% endfor %}
+                            </td>
+                            <td>{{ candidate.get("hard_skills") }}</td>
+                            <td>{{ candidate.get("soft_skills") }}</td>
+                            <td>{{ candidate.get("languages") }}</td>
+                            <td><a href="{{ candidate.get("project_links")}}" target="_blank">Link</a></td>
+                            <td><span class="status {{ candidate.get("status")|lower }}">{{ candidate.get("status") }}</span></td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -164,5 +172,6 @@
             </div>
         </div>
     </div>
+    
 </body>
 </html>

@@ -42,12 +42,12 @@
             <!-- Display job positions in rectangular boxes -->
             {% for position in positions %}
             <div class="job-box">
-                <h4>{{ position[0] }}</h4>
-                <p><strong>Key Responsibilities:</strong> {{ position[1] }}</p>
-                <p><strong>Qualifications:</strong> {{ position[2] }}</p>
-                <p><strong>Eligibility:</strong> {{ position[3] }}</p>
-                <p><strong>Hard Skills:</strong> {{ position[4] }}</p>
-                <p><strong>Soft Skills:</strong> {{ position[5] }}</p>
+                <h4>{{ position.get("job_title") }}</h4>
+                <p><strong>Key Responsibilities:</strong> {{ position.get("responsibilities") }}</p>
+                <p><strong>Qualifications:</strong> {{ position.get("qualifications") }}</p>
+                <p><strong>Eligibility:</strong> {{ position.get("eligibility") }}</p>
+                <p><strong>Hard Skills:</strong> {{ position.get("hard_skills") }}</p>
+                <p><strong>Soft Skills:</strong> {{ position.get("soft_skills") }}</p>
             </div>
             {% endfor %}
 

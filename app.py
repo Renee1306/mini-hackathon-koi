@@ -5,48 +5,45 @@ import requests
 import re
 import json
 from docx import Document
+import os
+import certifi
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+ca = certifi.where()
+load_dotenv()
 
 app = Flask(__name__)
 #hi
-AZURE_API_KEY = "b29894cc56df42bdbd5a5dd270d97171"
-AZURE_API_URL = "https://minihackathon01.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-08-01-preview"
+AZURE_API_KEY = "4960b7d3c80e4043a9849ea4a5add5d8"
+AZURE_API_URL = "https://resume-scanner.openai.azure.com/openai/deployments/gpt-35-turbo-16k/chat/completions?api-version=2024-08-01-preview"
+MONGO_URI = os.getenv('MONGODB_URI')
+client = MongoClient(MONGO_URI, tlsCAFile=ca)
 
 def list_to_string(item):
     if isinstance(item, list):
         # Join list elements into a single string, with each item ending with a newline character
-        return "".join(map(str, item)) + "  "
+        return "<br>".join(map(str, item))
     else:
         # Convert non-list items directly to a string
         return str(item)
-
-      
       
 def get_candidates(selected_string):
     selected_list = selected_string.split(', ')
     candidates = []
-    with open('database/candidates.txt', 'r') as file:
-        for select in selected_list:
-            for line in file:
-                # Split each line by the '|' character and store it as a list
-                candidate_data = line.strip().split('|')
-                if candidate_data[0] == select:
-                    candidate_data[14]= "file:///" + candidate_data[14].replace(" ", "%20").replace("\\", "/")
-                    print("Link" + candidate_data[14])
-                    candidates.append(candidate_data)
-                    break
+    db = client['hire_db']
+    collection = db['candidate']
+    for select in selected_list:
+        candidate = collection.find_one({"id": select})
+        candidates.append(candidate)
+
     return candidates
 
 def get_job(chosen_job):
-    with open('database/open_position.txt', 'r') as file:
-        for line in file:
-            position_data = line.strip().split('|')
-            if position_data[0] == chosen_job:
-                # Replace commas with newlines for proper display in HTML
-                position_data[1] = position_data[1].replace(', ', '\n')  # Responsibilities
-                position_data[2] = position_data[2].replace(', ', '\n')  # Qualifications
-                position_data[3] = position_data[3].replace(', ', '\n')  # Eligibility
-                break
-    return position_data
+    db = client['hire_db']
+    collection = db['open_position']
+    job = collection.find_one({"job_title": chosen_job})
+    return job
   
 def comparison_azure(candidates_compare_json, job_description):
     print(candidates_compare_json)
@@ -72,58 +69,49 @@ def comparison_azure(candidates_compare_json, job_description):
     else:
         return "Evaluation error"
       
-# Function to read candidates.txt and parse data
 def read_candidates():
-    candidates = []
-    with open('database/candidates.txt', 'r') as file:
-        for line in file:
-            # Split each line by the '|' character and store it as a list
-            candidate_data = line.strip().split('|')
-            candidate_data[14]= "file:///" + candidate_data[14].replace(" ", "%20").replace("\\", "/")
-            print("Link" + candidate_data[14])
-            candidates.append(candidate_data)
-
-    return candidates
+    db = client['hire_db']
+    collection = db['candidate']
+    print
+    return list(collection.find())
 
 
 # Function to read open_position.txt and parse data
 def read_positions():
-    positions = []
-    with open('database/open_position.txt', 'r') as file:
-        for line in file:
-            position_data = line.strip().split('|')
-            # Replace commas with newlines for proper display in HTML
-            position_data[1] = position_data[1].replace(', ', '\n')  # Responsibilities
-            position_data[2] = position_data[2].replace(', ', '\n')  # Qualifications
-            position_data[3] = position_data[3].replace(', ', '\n')  # Eligibility
-            position_data[4] = position_data[4].replace(', ', '\n')  # Eligibility
-            position_data[5] = position_data[5].replace(', ', '\n')  # Eligibility
+    db = client['hire_db']
+    collection = db['open_position']
+    return(list(collection.find()))
 
-            positions.append(position_data)
-    return positions
 
-# Function to sanitize input by replacing newlines with commas
-def sanitize_input(text):
-    return text.replace('\n', ', ').replace('\r', '')  # Replaces newlines with commas
+def write_position(job_title, responsibilities, qualifications, eligibility, hard_skills, soft_skills):
+    db = client['hire_db']
+    collection = db['open_position']
 
-# Function to append new job details to open_position.txt
-def write_position(job_title, responsibilities, qualifications, eligibility,hard_skills,soft_skills):
-    job_title = sanitize_input(job_title)
-    responsibilities = sanitize_input(responsibilities)
-    qualifications = sanitize_input(qualifications)
-    eligibility = sanitize_input(eligibility)
-    hard_skills = sanitize_input(hard_skills)
-    soft_skills = sanitize_input(soft_skills)
+    # Construct the new job document
+    new_job = {
+        "job_title": job_title,
+        "responsibilities": responsibilities,
+        "qualifications": qualifications,
+        "eligibility": eligibility,
+        "hard_skills": hard_skills,
+        "soft_skills": soft_skills
+    }
+    collection.insert_one(new_job)
 
-    with open('database/open_position.txt', 'a') as file:
-        file.write(f"{job_title}|{responsibilities}|{qualifications}|{eligibility}|{hard_skills}|{soft_skills}\n")
 
 # Function to search positions by job title
 def search_positions(search_term):
+    db = client['hire_db']
+    collection = db['open_position']
     positions = read_positions()
     if search_term:
-        search_term = search_term.lower()  # Normalize the search term
-        filtered_positions = [position for position in positions if search_term in position[0].lower()]
+        search_term = search_term.lower() 
+        filtered_positions = collection.find({
+            "job_title": { 
+                "$regex": search_term, 
+                "$options": "i"  # Case-insensitive search
+            }
+        })
         return filtered_positions
     return positions
 
@@ -143,23 +131,6 @@ def extract_docx_text(file_path):
     for paragraph in doc.paragraphs:
         full_text.append(paragraph.text)
     return '\n'.join(full_text)
-
-# Function to load job positions from the file
-def load_jobs():
-    jobs = []
-    with open('database/open_position.txt', 'r') as f:
-        for line in f:
-            parts = line.strip().split('|')
-            job = {
-                'title': parts[0],
-                'description': parts[1],
-                'qualification': parts[2],
-                'experience': parts[3],
-                'hard_skills': parts[4],
-                'soft_skills': parts[5]
-            }
-            jobs.append(job)
-    return jobs
 
 def jd_azure(job_description):
     headers = {
@@ -185,7 +156,6 @@ def jd_azure(job_description):
         result = response.json()
         evaluation = result['choices'][0]['message']['content']
         evaluation_json = json.loads(evaluation)
-        print(evaluation_json)
         return evaluation_json
     else:
         return {"error": "Azure API request failed"}
@@ -250,7 +220,6 @@ def call_azure_api(resume_text, job_description):
         result = response.json()
         evaluation = result['choices'][0]['message']['content']
         evaluation_json = json.loads(evaluation)
-        print(evaluation)
 
         try:
             education = [
@@ -299,7 +268,7 @@ def index():
 @app.route('/candidates')
 def candidates():
     candidates_data = read_candidates()
-    applied_jobs = sorted(list(set(candidate[1] for candidate in candidates_data)))
+    applied_jobs = sorted(list(set(candidate.get("applied_job") for candidate in candidates_data)))
     return render_template('candidates.html', candidates=candidates_data, applied_jobs=applied_jobs)
 
 @app.route('/open_position', methods=['GET', 'POST'])
@@ -362,13 +331,14 @@ def job_matching():
             return jsonify({'error': 'Unsupported file format. Please upload a PDF or DOCX file.'}), 400
 
         # Find the selected job and its description
-        jobs = load_jobs()
-        selected_job = next((job for job in jobs if job['title'] == applied_job), None)
+        jobs = read_positions()
+
+        selected_job = get_job(applied_job)
 
         if not selected_job:
             return jsonify({'error': 'Job not found'}), 404
 
-        job_description = f"{selected_job['description']} {selected_job['qualification']} {selected_job['experience']} {selected_job['hard_skills']} {selected_job['soft_skills']}"
+        job_description = f"{selected_job.get("responsibilities")} {selected_job.get("qualifications")}  {selected_job.get("eligibility")}  {selected_job.get("hard_skills")}  {selected_job.get("hard_skills")}"
 
         # Send the resume and job description to Azure OpenAI for evaluation
         azure_response = call_azure_api(resume_text, job_description)
@@ -378,6 +348,7 @@ def job_matching():
 
         # Extract details from the Azure OpenAI response
         candidate_details = azure_response['details']
+        
         evaluation = azure_response['evaluation']
 
         # Get job title recommendations from Azure OpenAI
@@ -387,11 +358,30 @@ def job_matching():
         candidates = read_candidates()
         candidate_id = f"C{str(len(candidates) + 1).zfill(4)}"
         absolute_file_path = os.path.abspath(file_path).replace("\\", "/")
-
-        # Save the candidate's details into candidates.txt
-        with open('database/candidates.txt', 'a') as file:
-            file.write(f"{candidate_id}|{applied_job}|{candidate_details['score']}|{candidate_details['name']}|{candidate_details['phone']}|{candidate_details['email']}|{candidate_details['location']}|{candidate_details['work_experience']}|{candidate_details['education']}|{candidate_details['hard_skills']}|{candidate_details['soft_skills']}|{candidate_details['languages']}|{candidate_details['project_links']}|In-Progress|{absolute_file_path}\n")
-
+        new_candidate = {
+        'id': candidate_id,
+        'applied_job': applied_job,
+        "score": candidate_details.get("score"),
+        'name': candidate_details.get("name"),
+        'phone': candidate_details.get("phone"),
+        'email': candidate_details.get("email"),
+        'location': candidate_details.get("location"),
+        "work_experience": candidate_details.get("work_experience"),
+        "education": candidate_details.get("education"),
+        'hard_skills': candidate_details.get("hard_skills"),
+        'soft_skills': candidate_details.get("soft_skills"),
+        'languages': candidate_details.get("languages"),
+        'project_links': candidate_details.get("project_links"),
+        'status': "In-Progress",
+        'resume_path': absolute_file_path
+        }
+        candidate_details["work_experience"] = list_to_string(candidate_details["work_experience"])
+        candidate_details["education"] = list_to_string(candidate_details["education"])
+        print(candidate_details)
+        db = client['hire_db']
+        collection = db['candidate']
+        insert_result = collection.insert_one(new_candidate)
+        
         # Return the evaluation, extracted details, and job title suggestions
         return jsonify({
             'evaluation': evaluation,
@@ -400,15 +390,13 @@ def job_matching():
         })
 
     # Load available jobs for dropdown selection if it's a GET request
-    jobs = load_jobs()
+    jobs = read_positions()
     return render_template('job_matching.html', jobs=jobs)
-
 
 # Function to suggest similar job titles based on Azure OpenAI
 def suggest_similar_jobs(resume_text):
     # Get all job titles from the open_position.txt file
-    job_titles = [job['title'] for job in load_jobs()]
-    
+    job_titles = [job['job_title'] for job in read_positions() if 'job_title' in job]
     headers = {
         'Content-Type': 'application/json',
         'api-key': AZURE_API_KEY
@@ -434,7 +422,6 @@ def suggest_similar_jobs(resume_text):
 def schedule():
     return render_template('schedule.html')
 
-
 @app.route('/comparison', methods=['GET', 'POST'])
 def comparison():
     if request.method == 'POST':
@@ -444,15 +431,14 @@ def comparison():
         formatted_candidates = []
         for candidate in candidates:
             formatted_candidates.append({
-                'id': candidate[0],
-                'applied_job': candidate[1],
-                'name': candidate[3],
-                'experience': candidate[7],
-                'education': candidate[8],
-                'hard_skills': candidate[9],
-                'soft_skills': candidate[10],
-                'languages': candidate[11]
-                # Add other fields as needed
+                'id': candidate.get("id"),
+                'applied_job': candidate.get("applied_job"),
+                'name': candidate.get("name"),
+                'experience': candidate.get("work_experience"),
+                'education': candidate.get("education"),
+                'hard_skills': candidate.get("hard_skills"),
+                'soft_skills': candidate.get("soft_skills"),
+                'languages': candidate.get("languages")
             })
         job = request.form['applied-job']
         
@@ -467,7 +453,7 @@ def comparison():
         if selected_job:
             candidates_data = [candidate for candidate in candidates_data if candidate[1] == selected_job]
 
-        jobs = load_jobs()  # Load the jobs for dropdown
+        jobs = read_positions()  # Load the jobs for dropdown
 
         return render_template('comparison.html', candidates=candidates_data, jobs=jobs)
 

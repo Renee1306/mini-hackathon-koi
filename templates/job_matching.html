@@ -64,7 +64,7 @@
                     <label for="applied-job">Select the Applied Job:</label>
                     <select id="applied-job" name="applied_job" required>
                         {% for job in jobs %}
-                            <option value="{{ job['title'] }}">{{ job['title'] }}</option>
+                            <option value="{{ job.get("job_title") }}">{{ job.get("job_title") }}</option>
                         {% endfor %}
                     </select>
 
@@ -217,5 +217,6 @@
             </script>
         </div>
     </div>
+    
 </body>
 </html>
